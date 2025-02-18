@@ -1,11 +1,13 @@
 <script>
+export default {
+  name: "Register"
+}
 </script>
 
 <template>
-  <main>
-    <h1>EatMatch Frontend</h1>
-  </main>
+
 </template>
 
 <style scoped>
+
 </style>
