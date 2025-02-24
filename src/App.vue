@@ -1,17 +1,17 @@
 <script>
 import {defineComponent} from "vue";
-import Login from "@/views/Login.vue";
+import Login from "@/components/Login.vue";
 import Register from "@/views/Register.vue";
+import Header from "@/components/Header.vue";
 
 export default defineComponent({
-  components: {Register, Login}
+  components: {Header, Register, Login}
 })
 </script>
 
 <template>
+  <Header/>
   <h1>EatMatch Frontend</h1>
-  <Login/>
-  <Register/>
 </template>
 
 <style scoped>
