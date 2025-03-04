@@ -6,21 +6,25 @@
       <p>Contact us</p>
       <!-- Clicking the button sets the flag to true -->
       <button @click="showLogin = true">Login</button>
+      <button @click="showRegister = true">Register</button>
     </div>
     <!-- Conditionally render the Login component -->
     <Login v-if="showLogin" @close="showLogin = false" />
+    <Register v-if="showRegister" @close="showRegister = false"/>
   </header>
 </template>
 
 <script>
 import Login from './Login.vue'
+import Register from './Register.vue'
 
 export default {
   name: "Header",
-  components: { Login },
+  components: {Register, Login },
   data() {
     return {
-      showLogin: false
+      showLogin: false,
+      showRegister: false
     }
   }
 }

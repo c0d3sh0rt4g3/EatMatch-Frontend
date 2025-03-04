@@ -1,7 +1,7 @@
 <script>
 import {defineComponent} from "vue";
 import Login from "@/components/Login.vue";
-import Register from "@/views/Register.vue";
+import Register from "@/components/Register.vue";
 import Header from "@/components/Header.vue";
 
 export default defineComponent({
