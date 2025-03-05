@@ -4,11 +4,9 @@
     <div class="sections-container">
       <p>Make a review</p>
       <p>Contact us</p>
-      <!-- Clicking the button sets the flag to true -->
       <button @click="showLogin = true">Login</button>
       <button @click="showRegister = true">Register</button>
     </div>
-    <!-- Conditionally render the Login component -->
     <Login v-if="showLogin" @close="showLogin = false" />
     <Register v-if="showRegister" @close="showRegister = false"/>
   </header>

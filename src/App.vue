@@ -12,9 +12,29 @@ export default defineComponent({
 
 <template>
   <Header/>
-  <h1>EatMatch Frontend</h1>
   <Profile/>
 </template>
 
-<style scoped>
+<style>
+  #app {
+    height: 100vh;
+  }
+  .user-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    height: 60vh;
+    width: 35vw;
+  }
+  #user-form {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+  }
 </style>

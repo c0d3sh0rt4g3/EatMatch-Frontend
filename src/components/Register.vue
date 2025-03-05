@@ -5,9 +5,12 @@ export default {
 </script>
 
 <template>
-  <div class="register-modal">
-    <form id="register-form">
+  <div class="user-modal">
+    <form id="user-form">
       <h2>Register</h2>
+      <label for="name-textbox">Name:</label>
+      <input type="text" name="name" id="name-textbox">
+
       <label for="surname-textbox">Surname:</label>
       <input type="text" name="surname" id="surname-textbox">
 
@@ -25,29 +28,4 @@ export default {
 </template>
 
 <style scoped>
-#register-form {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-around;
-  align-items: center;
-  width: 100%;
-  height: 100%;
-}
-.register-modal {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: white;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-  height: 40vh;
-  width: 35vw;
-}
-
-/* Optional overlay styling */
-.register-modal::before {
-  content: "";
-  position: fixed;
-  background: rgba(0, 0, 0, 0.5);
-}
 </style>
