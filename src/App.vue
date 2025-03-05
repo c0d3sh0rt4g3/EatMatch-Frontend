@@ -12,7 +12,7 @@ export default defineComponent({
 
 <template>
   <Header/>
-  <Profile/>
+  <router-view/>
 </template>
 
 <style>
