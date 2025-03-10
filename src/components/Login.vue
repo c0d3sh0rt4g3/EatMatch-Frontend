@@ -34,6 +34,7 @@
 <script>
 import axios from "axios";
 import { storeUser } from "@/helpers/storeUser.js";
+import { useUserStore } from "@/stores/userStore.js";
 
 export default {
   name: "Login",
@@ -48,7 +49,6 @@ export default {
   },
   methods: {
     validateEmail() {
-      // Reset any previous error
       this.emailError = "";
       const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailPattern.test(this.email)) {
@@ -56,29 +56,34 @@ export default {
       }
     },
     validatePassword() {
-      // Reset any previous error
       this.passwordError = "";
       if (!this.password || !this.password.trim()) {
         this.passwordError = "Please enter a valid password.";
       }
     },
     async loginUser() {
-      // Run validations on both fields before submitting
+      // Validate fields on blur
       this.validateEmail();
       this.validatePassword();
-
       if (this.emailError || this.passwordError) {
         return;
       }
-
       try {
-        // Send credentials to the API endpoint
+        // Send login credentials to the API endpoint.
         const response = await axios.post("http://localhost:8000/api/login", {
           email: this.email,
           password: this.password
         });
         console.log("Login successful:", response.data);
+
+        // Store user data in local storage using helper.
         storeUser(response.data);
+
+        // Update the Pinia store.
+        const userStore = useUserStore();
+        userStore.setUser(response.data);
+
+        // Close the modal on successful login.
         this.$emit("close");
       } catch (error) {
         console.error("Login failed:", error.response ? error.response.data : error);

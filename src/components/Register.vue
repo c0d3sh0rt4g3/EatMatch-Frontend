@@ -1,93 +1,3 @@
-<script>
-import axios from "axios";
-import { storeUser } from "@/helpers/storeUser.js";
-
-export default {
-  name: "Register",
-  data() {
-    return {
-      name: "",
-      email: "",
-      createPassword: "",
-      repeatPassword: "",
-      nameError: "",
-      emailError: "",
-      createPasswordError: "",
-      repeatPasswordError: "",
-      registerError: ""
-    };
-  },
-  methods: {
-    validateName() {
-      this.nameError = "";
-      if (!this.name || this.name.trim().length < 3) {
-        this.nameError = "Name must be at least 3 characters long.";
-      }
-    },
-    validateEmail() {
-      this.emailError = "";
-      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailPattern.test(this.email)) {
-        this.emailError = "Please enter a valid email address.";
-      }
-    },
-    validateCreatePassword() {
-      this.createPasswordError = "";
-      if (!this.createPassword || this.createPassword.length < 8) {
-        this.createPasswordError =
-          "Password must be at least 8 characters long.";
-      }
-    },
-    validateRepeatPassword() {
-      this.repeatPasswordError = "";
-      if (this.repeatPassword !== this.createPassword) {
-        this.repeatPasswordError = "Passwords do not match.";
-      }
-    },
-    async registerUser() {
-      // Trigger validations for all fields before submitting
-      this.validateName();
-      this.validateEmail();
-      this.validateCreatePassword();
-      this.validateRepeatPassword();
-
-      if (
-        this.nameError ||
-        this.emailError ||
-        this.createPasswordError ||
-        this.repeatPasswordError
-      ) {
-        return;
-      }
-
-      try {
-        // Send registration data to the API endpoint
-        const response = await axios.post("http://localhost:8000/api/register", {
-          name: this.name,
-          email: this.email,
-          password: this.createPassword,
-          password_confirmation: this.repeatPassword
-        });
-        console.log("Registration successful:", response.data);
-
-        // Store user data in local storage using helper
-        storeUser(response.data);
-
-        // Close the modal on successful registration
-        this.$emit("close");
-      } catch (error) {
-        console.error(
-          "Registration failed:",
-          error.response ? error.response.data : error
-        );
-        this.registerError =
-          "Registration failed. Please try again later.";
-      }
-    }
-  }
-};
-</script>
-
 <template>
   <div class="user-form-modal">
     <form class="user-form" @submit.prevent="registerUser">
@@ -136,11 +46,99 @@ export default {
       <button type="submit">Register</button>
       <button type="button" @click="$emit('close')">Close</button>
 
-      <!-- Global error message -->
       <p v-if="registerError" class="error">{{ registerError }}</p>
     </form>
   </div>
 </template>
+
+<script>
+import axios from "axios";
+import { storeUser } from "@/helpers/storeUser.js";
+import { useUserStore } from "@/stores/userStore.js";
+
+export default {
+  name: "Register",
+  data() {
+    return {
+      name: "",
+      email: "",
+      createPassword: "",
+      repeatPassword: "",
+      nameError: "",
+      emailError: "",
+      createPasswordError: "",
+      repeatPasswordError: "",
+      registerError: ""
+    };
+  },
+  methods: {
+    validateName() {
+      this.nameError = "";
+      if (!this.name || this.name.trim().length < 3) {
+        this.nameError = "Name must be at least 3 characters long.";
+      }
+    },
+    validateEmail() {
+      this.emailError = "";
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailPattern.test(this.email)) {
+        this.emailError = "Please enter a valid email address.";
+      }
+    },
+    validateCreatePassword() {
+      this.createPasswordError = "";
+      if (!this.createPassword || this.createPassword.length < 6) {
+        this.createPasswordError = "Password must be at least 6 characters long.";
+      }
+    },
+    validateRepeatPassword() {
+      this.repeatPasswordError = "";
+      if (this.repeatPassword !== this.createPassword) {
+        this.repeatPasswordError = "Passwords do not match.";
+      }
+    },
+    async registerUser() {
+      // Trigger validations on blur and before submit.
+      this.validateName();
+      this.validateEmail();
+      this.validateCreatePassword();
+      this.validateRepeatPassword();
+
+      if (
+        this.nameError ||
+        this.emailError ||
+        this.createPasswordError ||
+        this.repeatPasswordError
+      ) {
+        return;
+      }
+
+      try {
+        // Send registration data to the API endpoint.
+        const response = await axios.post("http://localhost:8000/api/register", {
+          name: this.name,
+          email: this.email,
+          password: this.createPassword
+        });
+        console.log("Registration successful:", response.data);
+
+        // Store user data in local storage using the helper.
+        storeUser(response.data);
+
+        // Update the Pinia store.
+        const userStore = useUserStore();
+        userStore.setUser(response.data);
+
+        // Close the modal on successful registration.
+        this.$emit("close");
+      } catch (error) {
+        console.error("Registration failed:", error.response ? error.response.data : error);
+        this.registerError = "Registration failed. Please try again later.";
+      }
+    }
+  }
+};
+</script>
 
 <style scoped>
 </style>
