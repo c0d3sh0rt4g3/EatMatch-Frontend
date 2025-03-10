@@ -1,5 +1,5 @@
 <template>
-  <div class="user-form-modal">
+  <div class="user-modal">
     <form class="user-form" @submit.prevent="registerUser">
       <h2>Register</h2>
 
@@ -141,29 +141,4 @@ export default {
 </script>
 
 <style scoped>
-#register-form {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-around;
-  align-items: center;
-  width: 100%;
-  height: 100%;
-}
-.register-modal {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: white;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-  height: 40vh;
-  width: 35vw;
-}
-
-/* Optional overlay styling */
-.register-modal::before {
-  content: "";
-  position: fixed;
-  background: rgba(0, 0, 0, 0.5);
-}
 </style>

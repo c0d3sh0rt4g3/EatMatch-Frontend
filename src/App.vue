@@ -29,7 +29,7 @@ export default defineComponent({
     height: 60vh;
     width: 35vw;
   }
-  #user-form {
+  .user-form {
     display: flex;
     flex-direction: column;
     justify-content: space-evenly;
@@ -38,7 +38,7 @@ export default defineComponent({
     width: 100%;
   }
   /* Optional overlay styling */
-.user-form-modal::before {
+.user-modal::before {
   content: "";
   position: fixed;
   background: rgba(0, 0, 0, 0.5);
