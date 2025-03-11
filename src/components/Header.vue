@@ -81,7 +81,7 @@ export default {
   background-color: var(--color-bg-primary);
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
   position: sticky;
-  top: 0;
+  margin: 0;
   z-index: 100;
 }
 

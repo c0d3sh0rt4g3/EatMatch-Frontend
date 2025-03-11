@@ -67,14 +67,18 @@ export default defineComponent({
     --color-border-dark: var(--color-gray-400);
   }
 
+  * {
+    margin: 0;
+    box-sizing: border-box;
+  }
+
   #app {
     font-family: 'Poppins', sans-serif;
-    max-width: 100%;
-    margin: 0 auto;
     padding: 0;
     background-color: var(--color-gray-100);
     color: var(--color-gray-700);
     height: 100vh;
+    width: 100%;
   }
   .user-modal {
     position: fixed;
