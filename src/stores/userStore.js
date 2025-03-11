@@ -3,15 +3,15 @@ import { defineStore } from 'pinia';
 export const useUserStore = defineStore('user', {
   state: () => ({
     logged: false,
-    user: null
+    userData: null
   }),
   actions: {
     setUser(userData) {
-      this.user = userData;
+      this.userData = userData;
       this.logged = true;
     },
     logout() {
-      this.user = null;
+      this.userData = null;
       this.logged = false;
     }
   }
