@@ -6,22 +6,25 @@ export default {
 
 <template>
 <footer class="bottom-footer">
-  <div class="footer-item active">
+  <router-link to="/" class="footer-item" active-class="active">
     <span class="footer-icon">🏠</span>
     <span class="footer-text">Home</span>
-  </div>
-  <div class="footer-item">
+  </router-link>
+
+  <router-link to="/restaurants" class="footer-item" active-class="active">
     <span class="footer-icon">🔍</span>
     <span class="footer-text">Explore</span>
-  </div>
-  <div class="footer-item">
+  </router-link>
+
+  <router-link to="/restaurants" class="footer-item" active-class="active">
     <span class="footer-icon">⭐</span>
     <span class="footer-text">Reviews</span>
-  </div>
-  <div class="footer-item">
+  </router-link>
+
+  <router-link to="/profile" class="footer-item" active-class="active">
     <span class="footer-icon">👤</span>
     <span class="footer-text">Profile</span>
-  </div>
+  </router-link>
 </footer>
 </template>
 
@@ -45,6 +48,8 @@ export default {
   cursor: pointer;
   padding: 8px 0;
   width: 25%;
+  text-decoration: none;
+  color: inherit;
 }
 
 .footer-icon {

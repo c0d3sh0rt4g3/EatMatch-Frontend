@@ -56,7 +56,6 @@ export default {
       <!-- Recent reviews would go here -->
     </div>
   </section>
-  <Footer/>
 </template>
 
 <style scoped>

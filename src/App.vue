@@ -4,15 +4,17 @@ import Login from "@/components/Login.vue";
 import Register from "@/components/Register.vue";
 import Header from "@/components/Header.vue";
 import Profile from "@/pages/Profile.vue";
+import Footer from "@/components/Footer.vue";
 
 export default defineComponent({
-  components: {Profile, Header, Register, Login}
+  components: {Footer, Profile, Header, Register, Login}
 })
 </script>
 
 <template>
   <Header/>
   <router-view/>
+  <Footer/>
 </template>
 
 <style>
