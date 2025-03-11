@@ -1,6 +1,9 @@
 <script>
+import Footer from "@/components/Footer.vue";
+
 export default {
   name: "Home",
+  components: {Footer},
   data() {
     return {
       featuredRestaurants: [
@@ -20,129 +23,47 @@ export default {
 </script>
 
 <template>
-  <div class="home-container">
-    <section class="categories-section">
-      <h2>Categories</h2>
-      <div class="categories-container">
-        <div v-for="category in categories" :key="category.id" class="category-card">
-          <div class="category-icon">{{ category.icon }}</div>
-          <p>{{ category.name }}</p>
-        </div>
+  <section class="categories-section">
+    <h2>Categories</h2>
+    <div class="categories-container">
+      <div v-for="category in categories" :key="category.id" class="category-card">
+        <div class="category-icon">{{ category.icon }}</div>
+        <p>{{ category.name }}</p>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <section class="featured-section">
-      <h2>Featured Restaurants</h2>
-      <div class="restaurant-cards">
-        <div v-for="restaurant in featuredRestaurants" :key="restaurant.id" class="restaurant-card">
-          <div class="restaurant-image" :style="{ backgroundImage: `url(${restaurant.image})` }"></div>
-          <div class="restaurant-info">
-            <h3>{{ restaurant.name }}</h3>
-            <div class="restaurant-details">
-              <span class="rating">★ {{ restaurant.rating }}</span>
-              <span class="cuisine">{{ restaurant.cuisine }}</span>
-            </div>
-            <button class="review-button">Write Review</button>
+  <section class="featured-section">
+    <h2>Featured Restaurants</h2>
+    <div class="restaurant-cards">
+      <div v-for="restaurant in featuredRestaurants" :key="restaurant.id" class="restaurant-card">
+        <div class="restaurant-image" :style="{ backgroundImage: `url(${restaurant.image})` }"></div>
+        <div class="restaurant-info">
+          <h3>{{ restaurant.name }}</h3>
+          <div class="restaurant-details">
+            <span class="rating">★ {{ restaurant.rating }}</span>
+            <span class="cuisine">{{ restaurant.cuisine }}</span>
           </div>
+          <button class="review-button">Write Review</button>
         </div>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <section class="recent-reviews">
-      <h2>Recent Reviews</h2>
-      <div class="reviews-container">
-        <!-- Recent reviews would go here -->
-      </div>
-    </section>
-
-    <nav class="bottom-nav">
-      <div class="nav-item active">
-        <span class="nav-icon">🏠</span>
-        <span class="nav-text">Home</span>
-      </div>
-      <div class="nav-item">
-        <span class="nav-icon">🔍</span>
-        <span class="nav-text">Explore</span>
-      </div>
-      <div class="nav-item">
-        <span class="nav-icon">⭐</span>
-        <span class="nav-text">Reviews</span>
-      </div>
-      <div class="nav-item">
-        <span class="nav-icon">👤</span>
-        <span class="nav-text">Profile</span>
-      </div>
-    </nav>
-  </div>
+  <section class="recent-reviews">
+    <h2>Recent Reviews</h2>
+    <div class="reviews-container">
+      <!-- Recent reviews would go here -->
+    </div>
+  </section>
+  <Footer/>
 </template>
 
 <style scoped>
-/* Base Styles */
-.home-container {
-  font-family: 'Poppins', sans-serif;
-  max-width: 100%;
-  margin: 0 auto;
-  padding: 0;
-  background-color: var(--color-gray-100);
-  color: var(--color-gray-700);
-}
 
 h1, h2, h3 {
   margin: 0;
   font-weight: 600;
-}
-
-/* Header Styles */
-.app-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px 16px;
-  background-color: var(--color-bg-primary);
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-
-.logo h1 {
-  font-size: 24px;
-  color: var(--color-primary);
-  margin: 0;
-}
-
-.search-bar {
-  display: flex;
-  flex: 1;
-  max-width: 500px;
-  margin: 0 20px;
-}
-
-.search-bar input {
-  flex: 1;
-  padding: 12px 16px;
-  border: 1px solid var(--color-border-light);
-  border-radius: 24px 0 0 24px;
-  font-size: 14px;
-  outline: none;
-}
-
-.search-button {
-  padding: 12px 20px;
-  background-color: var(--color-primary);
-  color: var(--color-text-inverse);
-  border: none;
-  border-radius: 0 24px 24px 0;
-  cursor: pointer;
-  font-weight: 500;
-}
-
-.user-profile .avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background-color: var(--color-border-light);
-  cursor: pointer;
 }
 
 /* Categories Section */
@@ -270,41 +191,6 @@ h1, h2, h3 {
 .recent-reviews h2 {
   margin-bottom: 16px;
   font-size: 20px;
-}
-
-/* Bottom Navigation */
-.bottom-nav {
-  display: flex;
-  justify-content: space-around;
-  background-color: var(--color-bg-primary);
-  padding: 12px 0;
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
-}
-
-.nav-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  cursor: pointer;
-  padding: 8px 0;
-  width: 25%;
-}
-
-.nav-icon {
-  font-size: 20px;
-  margin-bottom: 4px;
-}
-
-.nav-text {
-  font-size: 12px;
-  font-weight: 500;
-}
-
-.nav-item.active {
-  color: var(--color-primary);
 }
 
 /* Responsive Adjustments */
