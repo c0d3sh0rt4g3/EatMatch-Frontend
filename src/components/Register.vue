@@ -52,7 +52,7 @@
 </template>
 
 <script>
-import axios from "axios";
+import authService from "@/services/authService.js";
 import { storeUser } from "@/helpers/storeUser.js";
 import { useUserStore } from "@/stores/userStore.js";
 
@@ -98,7 +98,7 @@ export default {
       }
     },
     async registerUser() {
-      // Trigger validations on blur and before submit.
+      // Validate all fields before submission
       this.validateName();
       this.validateEmail();
       this.validateCreatePassword();
@@ -113,28 +113,34 @@ export default {
         return;
       }
 
-      try {
-        // Send registration data to the API endpoint.
-        const response = await axios.post("http://localhost:8000/api/register", {
-          name: this.name,
-          email: this.email,
-          password: this.createPassword
-        });
-        console.log("Registration successful:", response.data);
+      // Prepare user data for registration
+      const userData = {
+        name: this.name,
+        email: this.email,
+        password: this.createPassword,
+        password_confirmation: this.repeatPassword
+      };
 
-        // Store user data in local storage using the helper.
-        storeUser(response.data);
+      // Use authService to register the user
+      const [error, data] = await authService.register(userData);
 
-        // Update the Pinia store.
-        const userStore = useUserStore();
-        userStore.setUser(response.data);
-
-        // Close the modal on successful registration.
-        this.$emit("close");
-      } catch (error) {
-        console.error("Registration failed:", error.response ? error.response.data : error);
+      if (error) {
+        console.error("Registration failed:", error);
         this.registerError = "Registration failed. Please try again later.";
+        return;
       }
+
+      console.log("Registration successful:", data);
+
+      // Store user data in local storage
+      storeUser(data);
+
+      // Update the Pinia store
+      const userStore = useUserStore();
+      userStore.setUser(data);
+
+      // Close the modal on successful registration
+      this.$emit("close");
     }
   }
 };

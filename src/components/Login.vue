@@ -35,6 +35,7 @@
 import axios from "axios";
 import { storeUser } from "@/helpers/storeUser.js";
 import { useUserStore } from "@/stores/userStore.js";
+import authService from "@/services/authService.js";
 
 export default {
   name: "Login",
@@ -62,33 +63,28 @@ export default {
       }
     },
     async loginUser() {
-      // Validate fields on blur
       this.validateEmail();
       this.validatePassword();
       if (this.emailError || this.passwordError) {
         return;
       }
-      try {
-        // Send login credentials to the API endpoint.
-        const response = await axios.post("http://localhost:8000/api/login", {
-          email: this.email,
-          password: this.password
-        });
-        console.log("Login successful:", response.data);
 
-        // Store user data in local storage using helper.
-        storeUser(response.data);
+      const [error, userData] = await authService.login(this.email, this.password);
 
-        // Update the Pinia store.
-        const userStore = useUserStore();
-        userStore.setUser(response.data);
-
-        // Close the modal on successful login.
-        this.$emit("close");
-      } catch (error) {
-        console.error("Login failed:", error.response ? error.response.data : error);
+      if (error) {
         this.loginError = "Error, Incorrect email or password";
+        return;
       }
+
+      // Store user data in local storage using helper
+      storeUser(userData);
+
+      // Update the Pinia store
+      const userStore = useUserStore();
+      userStore.setUser(userData);
+
+      // Close the modal on successful login
+      this.$emit("close");
     }
   }
 };
