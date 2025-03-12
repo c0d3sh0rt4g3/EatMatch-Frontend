@@ -8,7 +8,9 @@
         <p v-if="restaurant.city">{{ restaurant.city }}, {{ restaurant.country }}</p>
       </div>
     </div>
-    <button class="review-button">Write Review</button>
+    <router-link :to="`/restaurants/${restaurant.place_id}`">
+      <button class="review-button">Write Review</button>
+    </router-link>
   </div>
 </template>
 
