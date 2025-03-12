@@ -1,128 +1,142 @@
 <template>
   <div class="profile-container">
-    <div class="profile-header">
-      <div class="profile-avatar">
-        <div class="avatar-placeholder">{{ getUserInitials() }}</div>
-      </div>
-      <div class="profile-info">
-        <h1 class="profile-name">{{ user?.name || 'User' }} {{ user?.surname || '' }}</h1>
-        <p class="profile-email">{{ user?.email || 'No email available' }}</p>
+    <!-- Authentication warning message -->
+    <div v-if="!isLoggedIn" class="auth-warning">
+      <div class="warning-content">
+        <h2>Authentication Required</h2>
+        <p>You need to be logged in to access your profile page.</p>
+        <div class="warning-actions">
+          <router-link to="/" class="primary-button">Ok</router-link>
+        </div>
       </div>
     </div>
 
-    <section class="profile-stats" v-if="user">
-      <div class="stat-card">
-        <span class="number">{{ userReviews.length }}</span>
-        <span class="label">Reviews</span>
-      </div>
-      <div class="stat-card">
-        <span class="number">{{ getAverageRating() }}</span>
-        <span class="label">Avg. Rating</span>
-      </div>
-      <div class="stat-card">
-        <span class="number">{{ getMemberSince() }}</span>
-        <span class="label">Member Since</span>
-      </div>
-    </section>
-
-    <section class="activity-section">
-      <h2 class="section-title">Recent Activity</h2>
-
-      <div v-if="loading" class="loading-state">
-        <p>Loading your activity...</p>
+    <!-- Profile content (only shown when logged in) -->
+    <div v-else>
+      <div class="profile-header">
+        <div class="profile-avatar">
+          <div class="avatar-placeholder">{{ getUserInitials() }}</div>
+        </div>
+        <div class="profile-info">
+          <h1 class="profile-name">{{ user?.name || 'User' }} {{ user?.surname || '' }}</h1>
+          <p class="profile-email">{{ user?.email || 'No email available' }}</p>
+        </div>
       </div>
 
-      <div v-else-if="error" class="error-state">
-        <p>{{ error }}</p>
-      </div>
+      <section class="profile-stats" v-if="user">
+        <div class="stat-card">
+          <span class="number">{{ userReviews.length }}</span>
+          <span class="label">Reviews</span>
+        </div>
+        <div class="stat-card">
+          <span class="number">{{ getAverageRating() }}</span>
+          <span class="label">Avg. Rating</span>
+        </div>
+        <div class="stat-card">
+          <span class="number">{{ getMemberSince() }}</span>
+          <span class="label">Member Since</span>
+        </div>
+      </section>
 
-      <div v-else-if="userReviews.length === 0" class="empty-state">
-        <p>You haven't written any reviews yet.</p>
-        <button class="primary-button">Write Your First Review</button>
-      </div>
+      <section class="activity-section">
+        <h2 class="section-title">Recent Activity</h2>
 
-      <div v-else class="reviews-container">
-        <div v-for="review in userReviews" :key="review.id" class="review-card">
-          <div class="review-header">
-            <h3 class="restaurant-name">{{ review.restaurant.name }}</h3>
-            <div class="review-rating">
-              <span class="star-icon">★</span>
-              <span>{{ review.rating }}/5</span>
+        <div v-if="loading" class="loading-state">
+          <p>Loading your activity...</p>
+        </div>
+
+        <div v-else-if="error" class="error-state">
+          <p>{{ error }}</p>
+        </div>
+
+        <div v-else-if="userReviews.length === 0" class="empty-state">
+          <p>You haven't written any reviews yet.</p>
+          <button class="primary-button">Write Your First Review</button>
+        </div>
+
+        <div v-else class="reviews-container">
+          <div v-for="review in userReviews" :key="review.id" class="review-card">
+            <div class="review-header">
+              <h3 class="restaurant-name">{{ review.restaurant.name }}</h3>
+              <div class="review-rating">
+                <span class="star-icon">★</span>
+                <span>{{ review.rating }}/5</span>
+              </div>
             </div>
-          </div>
 
-          <h4 class="review-title">{{ review.title }}</h4>
-          <p class="review-body">{{ review.body }}</p>
+            <h4 class="review-title">{{ review.title }}</h4>
+            <p class="review-body">{{ review.body }}</p>
 
-          <div class="review-footer">
-            <span class="review-date">{{ formatDate(review.created_at) }}</span>
-            <div class="review-actions">
-              <button class="action-button" @click="openEditModal(review)">Edit</button>
-              <button class="action-button delete" @click="openDeleteConfirm(review.id)">Delete</button>
+            <div class="review-footer">
+              <span class="review-date">{{ formatDate(review.created_at) }}</span>
+              <div class="review-actions">
+                <button class="action-button" @click="openEditModal(review)">Edit</button>
+                <button class="action-button delete" @click="openDeleteConfirm(review.id)">Delete</button>
+              </div>
             </div>
           </div>
         </div>
+      </section>
+
+      <!-- Edit Review Modal -->
+      <div v-if="showEditModal" class="modal-overlay">
+        <div class="modal-content">
+          <h2>Edit Review</h2>
+          <form @submit.prevent="updateReview">
+            <div class="form-group">
+              <label for="reviewTitle">Title</label>
+              <input
+                id="reviewTitle"
+                v-model="editingReview.title"
+                type="text"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="reviewRating">Rating</label>
+              <select id="reviewRating" v-model="editingReview.rating" required>
+                <option v-for="n in 5" :key="n" :value="n">{{ n }}</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="reviewBody">Review</label>
+              <textarea
+                id="reviewBody"
+                v-model="editingReview.body"
+                rows="4"
+                required
+              ></textarea>
+            </div>
+
+            <div class="modal-actions">
+              <button type="button" class="secondary-button" @click="closeEditModal">Cancel</button>
+              <button type="submit" class="primary-button" :disabled="updating">
+                {{ updating ? 'Updating...' : 'Save Changes' }}
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
-    </section>
 
-    <!-- Edit Review Modal -->
-    <div v-if="showEditModal" class="modal-overlay">
-      <div class="modal-content">
-        <h2>Edit Review</h2>
-        <form @submit.prevent="updateReview">
-          <div class="form-group">
-            <label for="reviewTitle">Title</label>
-            <input
-              id="reviewTitle"
-              v-model="editingReview.title"
-              type="text"
-              required
-            />
-          </div>
-
-          <div class="form-group">
-            <label for="reviewRating">Rating</label>
-            <select id="reviewRating" v-model="editingReview.rating" required>
-              <option v-for="n in 5" :key="n" :value="n">{{ n }}</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="reviewBody">Review</label>
-            <textarea
-              id="reviewBody"
-              v-model="editingReview.body"
-              rows="4"
-              required
-            ></textarea>
-          </div>
+      <!-- Delete Confirmation Modal -->
+      <div v-if="showDeleteConfirm" class="modal-overlay">
+        <div class="modal-content delete-confirm">
+          <h2>Delete Review</h2>
+          <p>Are you sure you want to delete this review? This action cannot be undone.</p>
 
           <div class="modal-actions">
-            <button type="button" class="secondary-button" @click="closeEditModal">Cancel</button>
-            <button type="submit" class="primary-button" :disabled="updating">
-              {{ updating ? 'Updating...' : 'Save Changes' }}
+            <button type="button" class="secondary-button" @click="cancelDelete">Cancel</button>
+            <button
+              type="button"
+              class="danger-button"
+              :disabled="deleting"
+              @click="confirmDelete"
+            >
+              {{ deleting ? 'Deleting...' : 'Delete Review' }}
             </button>
           </div>
-        </form>
-      </div>
-    </div>
-
-    <!-- Delete Confirmation Modal -->
-    <div v-if="showDeleteConfirm" class="modal-overlay">
-      <div class="modal-content delete-confirm">
-        <h2>Delete Review</h2>
-        <p>Are you sure you want to delete this review? This action cannot be undone.</p>
-
-        <div class="modal-actions">
-          <button type="button" class="secondary-button" @click="cancelDelete">Cancel</button>
-          <button
-            type="button"
-            class="danger-button"
-            :disabled="deleting"
-            @click="confirmDelete"
-          >
-            {{ deleting ? 'Deleting...' : 'Delete Review' }}
-          </button>
         </div>
       </div>
     </div>
@@ -134,6 +148,7 @@ export default {
   name: "Profile",
   data() {
     return {
+      isLoggedIn: false,
       user: null,
       token: null,
       userReviews: [],
@@ -153,28 +168,40 @@ export default {
     };
   },
   created() {
-    this.fetchUserData();
+    this.checkAuthentication();
   },
   methods: {
-    fetchUserData() {
+    checkAuthentication() {
       // Get user data from localStorage
       const userData = localStorage.getItem('userData');
 
       if (userData) {
-        this.token = JSON.parse(userData).token;
         try {
-          if (!this.token) {
-            this.error = "Authentication token not found";
-            return;
+          const parsedData = JSON.parse(userData);
+          this.token = parsedData.token;
+
+          if (this.token) {
+            this.isLoggedIn = true;
+            this.user = parsedData.user;
+            this.fetchUserData();
+          } else {
+            this.isLoggedIn = false;
           }
-          this.user = JSON.parse(userData).user;
         } catch (e) {
           console.error('Error parsing user data:', e);
+          this.isLoggedIn = false;
         }
+      } else {
+        this.isLoggedIn = false;
+      }
+    },
+    fetchUserData() {
+      if (!this.isLoggedIn || !this.user?.id) {
+        this.loading = false;
+        return;
       }
 
-      // Get user ID from the user object or use a default
-      const userId = this.user?.id;
+      const userId = this.user.id;
 
       // Set up headers with bearer token
       const headers = {
@@ -206,7 +233,7 @@ export default {
       if (!dateString) return '';
 
       const date = new Date(dateString);
-      const today = new Date();
+      const today = new Date("2025-03-12T11:02:00");
 
       // Format options for date display
       const options = {
@@ -477,6 +504,7 @@ export default {
   cursor: pointer;
   margin-top: 16px;
   transition: background-color 0.2s;
+  text-decoration: none;
 }
 
 .primary-button:hover {
@@ -692,6 +720,43 @@ export default {
   color: #e53935;
   border-color: #e53935;
 }
+
+.auth-warning {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh;
+  padding: 20px;
+}
+
+.warning-content {
+  background-color: var(--color-bg-secondary);
+  border-radius: 16px;
+  padding: 40px;
+  text-align: center;
+  max-width: 500px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+}
+
+.warning-content h2 {
+  font-size: 24px;
+  color: var(--color-primary);
+  margin-bottom: 16px;
+}
+
+.warning-content p {
+  font-size: 16px;
+  color: var(--color-text-secondary);
+  margin-bottom: 24px;
+  line-height: 1.5;
+}
+
+.warning-actions {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .profile-header {
