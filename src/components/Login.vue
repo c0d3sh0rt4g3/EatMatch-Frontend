@@ -32,10 +32,7 @@
 </template>
 
 <script>
-import axios from "axios";
-import { storeUser } from "@/helpers/storeUser.js";
-import { useUserStore } from "@/stores/userStore.js";
-import authService from "@/services/authService.js";
+import { useAuthStore } from "@/stores/authStore.js";
 
 export default {
   name: "Login",
@@ -63,25 +60,27 @@ export default {
       }
     },
     async loginUser() {
+      // Clear previous error
+      this.loginError = "";
+
+      // Validate fields
       this.validateEmail();
       this.validatePassword();
       if (this.emailError || this.passwordError) {
         return;
       }
 
-      const [error, userData] = await authService.login(this.email, this.password);
+      // Use the auth store for login
+      const authStore = useAuthStore();
+      const [error, data] = await authStore.login({
+        email: this.email,
+        password: this.password
+      });
 
       if (error) {
-        this.loginError = "Error, Incorrect email or password";
+        this.loginError = authStore.getErrors.message;
         return;
       }
-
-      // Store user data in local storage using helper
-      storeUser(userData);
-
-      // Update the Pinia store
-      const userStore = useUserStore();
-      userStore.setUser(userData);
 
       // Close the modal on successful login
       this.$emit("close");

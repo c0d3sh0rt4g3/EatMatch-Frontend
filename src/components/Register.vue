@@ -52,9 +52,7 @@
 </template>
 
 <script>
-import authService from "@/services/authService.js";
-import { storeUser } from "@/helpers/storeUser.js";
-import { useUserStore } from "@/stores/userStore.js";
+import { useAuthStore } from "@/stores/authStore.js";
 
 export default {
   name: "Register",
@@ -98,7 +96,10 @@ export default {
       }
     },
     async registerUser() {
-      // Validate all fields before submission
+      // Clear previous error
+      this.registerError = "";
+
+      // Validate all fields
       this.validateName();
       this.validateEmail();
       this.validateCreatePassword();
@@ -113,31 +114,18 @@ export default {
         return;
       }
 
-      // Prepare user data for registration
-      const userData = {
+      // Use the auth store for registration
+      const authStore = useAuthStore();
+      const [error, data] = await authStore.register({
         name: this.name,
         email: this.email,
-        password: this.createPassword,
-        password_confirmation: this.repeatPassword
-      };
-
-      // Use authService to register the user
-      const [error, data] = await authService.register(userData);
+        password: this.createPassword
+      });
 
       if (error) {
-        console.error("Registration failed:", error);
-        this.registerError = "Registration failed. Please try again later.";
+        this.registerError = authStore.getErrors.message;
         return;
       }
-
-      console.log("Registration successful:", data);
-
-      // Store user data in local storage
-      storeUser(data);
-
-      // Update the Pinia store
-      const userStore = useUserStore();
-      userStore.setUser(data);
 
       // Close the modal on successful registration
       this.$emit("close");

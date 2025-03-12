@@ -10,7 +10,7 @@
         <button class="auth-button register-button" @click="showRegister = true">Register</button>
       </template>
       <template v-else>
-        <span class="welcome-text">Welcome, {{ name }}</span>
+        <span class="welcome-text">Welcome, {{ userName }}</span>
         <button class="auth-button logout-button" @click="logoutUser">Logout</button>
       </template>
     </div>
@@ -22,7 +22,7 @@
 <script>
 import Login from './Login.vue';
 import Register from './Register.vue';
-import { useUserStore } from '@/stores/userStore.js';
+import { useAuthStore } from '@/stores/authStore.js';
 
 export default {
   name: "Header",
@@ -34,36 +34,25 @@ export default {
     };
   },
   computed: {
-    userStore() {
-      return useUserStore();
+    authStore() {
+      return useAuthStore();
     },
     isLogged() {
-      return this.userStore.logged;
+      return this.authStore.isAuthenticated;
     },
-    name() {
-      return this.userStore.userData ? this.userStore.userData.user.name : '';
+    userName() {
+      return this.authStore.userData ? this.authStore.userData.user.name : '';
     }
   },
   methods: {
     logoutUser() {
-      this.userStore.logout();
-      localStorage.removeItem("userData");
-    },
-    checkUserInLocalStorage() {
-      const userData = localStorage.getItem("userData");
-      if (userData) {
-        const user = JSON.parse(userData);
-        if (user) {
-          this.userStore.setUser(user);
-        }
-      }
+      this.authStore.logout();
     }
-
   },
   mounted() {
-    this.checkUserInLocalStorage();
+    // Check if user exists in local storage on component mount
+    this.authStore.checkLocalStorage();
   }
-
 };
 </script>
 
