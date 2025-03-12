@@ -1,25 +1,63 @@
 <script>
 import Footer from "@/components/Footer.vue";
+import axios from "axios";
 
 export default {
   name: "Home",
-  components: {Footer},
+  components: { Footer },
   data() {
     return {
-      featuredRestaurants: [
-        { id: 1, name: "Bistro Moderne", rating: 4.7, cuisine: "French", image: "/images/restaurant1.jpg" },
-        { id: 2, name: "Spice Garden", rating: 4.5, cuisine: "Indian", image: "/images/restaurant2.jpg" },
-        { id: 3, name: "Ocean Blue", rating: 4.8, cuisine: "Seafood", image: "/images/restaurant3.jpg" }
-      ],
+      featuredRestaurants: [],
       categories: [
         { id: 1, name: "Italian", icon: "pasta" },
         { id: 2, name: "Japanese", icon: "sushi" },
         { id: 3, name: "Mexican", icon: "taco" },
         { id: 4, name: "Vegetarian", icon: "salad" }
-      ]
+      ],
+      loading: false,
+      error: null
+    };
+  },
+  created() {
+    this.fetchRestaurants();
+  },
+  methods: {
+    async fetchRestaurants() {
+      this.loading = true;
+      try {
+        const response = await axios.get("http://localhost:8000/api/restaurants");
+        const restaurants = response.data;
+
+        // Calculate average rating for each restaurant
+        const restaurantsWithRating = restaurants.map(restaurant => {
+          const reviews = restaurant.reviews || [];
+          const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0);
+          const avgRating = reviews.length > 0 ? (totalRating / reviews.length).toFixed(1) : 0;
+
+          return {
+            id: restaurant.id,
+            name: restaurant.name,
+            rating: parseFloat(avgRating),
+            // You might need to add cuisine data if it's available in your API
+            cuisine: "Various", // Placeholder
+            image: `/images/restaurant${restaurant.id % 5 + 1}.jpg` // Cycling through available images
+          };
+        });
+
+        // Sort by rating (highest first) and take top 5
+        this.featuredRestaurants = restaurantsWithRating
+          .sort((a, b) => b.rating - a.rating)
+          .slice(0, 5);
+
+      } catch (error) {
+        this.error = "Failed to fetch restaurants";
+        console.error(error);
+      } finally {
+        this.loading = false;
+      }
     }
   }
-}
+};
 </script>
 
 <template>
@@ -35,7 +73,9 @@ export default {
 
   <section class="featured-section">
     <h2>Featured Restaurants</h2>
-    <div class="restaurant-cards">
+    <div v-if="loading" class="loading">Loading restaurants...</div>
+    <div v-else-if="error" class="error">{{ error }}</div>
+    <div v-else class="restaurant-cards">
       <div v-for="restaurant in featuredRestaurants" :key="restaurant.id" class="restaurant-card">
         <div class="restaurant-image" :style="{ backgroundImage: `url(${restaurant.image})` }"></div>
         <div class="restaurant-info">

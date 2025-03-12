@@ -1,286 +1,235 @@
+<template>
+  <div class="restaurant-search">
+    <h1 class="page-title">Find Restaurants</h1>
+
+    <div class="search-container">
+      <input
+        v-model="searchQuery"
+        @keyup.enter="searchRestaurants"
+        @input="handleSearchInput"
+        type="text"
+        placeholder="Search for restaurants..."
+        class="search-input"
+      />
+      <button @click="searchRestaurants" class="search-button">Search</button>
+    </div>
+
+    <div v-if="loading" class="loading-state">
+      <div class="loading-spinner"></div>
+      <p>Searching for restaurants...</p>
+    </div>
+
+    <div v-if="error" class="error-state">
+      <p>{{ error }}</p>
+    </div>
+
+    <div v-if="restaurants.length" class="results">
+      <RestaurantCard
+        v-for="restaurant in restaurants"
+        :key="restaurant.place_id"
+        :restaurant="restaurant"
+      />
+    </div>
+
+    <div v-else-if="!loading && searchPerformed" class="empty-state">
+      <p>No restaurants found matching "{{ searchQuery }}"</p>
+      <p>Try a different search term or check your spelling.</p>
+    </div>
+  </div>
+</template>
+
 <script>
+import RestaurantCard from "@/components/RestaurantCard.vue";
+
 export default {
-  name: "Restaurants",
+  name: 'RestaurantSearch',
+  components: {
+    RestaurantCard
+  },
   data() {
     return {
-      map: null,
-      markers: [],
-      searchInput: '',
-      searchBox: null,
+      apiKey: 'd9fb600e734c4d20afecf495f842b821',
+      searchQuery: '',
       restaurants: [],
-      loading: false
+      loading: false,
+      error: null,
+      searchPerformed: false
     }
   },
-  mounted() {
-    this.loadGoogleMapsApi();
+  watch: {
+    searchQuery(newValue) {
+      if (!newValue || newValue.trim() === '') {
+        this.clearResults();
+      }
+    }
   },
   methods: {
-    loadGoogleMapsApi() {
-      if (window.google && window.google.maps) {
-        this.initMap();
-        return;
+    handleSearchInput() {
+      // Clear results when input changes
+      if (this.searchPerformed) {
+        this.clearResults();
       }
-
-      const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyANkU0fgMKKKjwP332Nz2WTGY29JRCfvTo&libraries=places&callback=initGoogleMaps`;
-      document.head.appendChild(script);
-
-      window.initGoogleMaps = () => {
-        this.initMap();
-      };
     },
 
-    initMap() {
-      // Initialize the map with a default location
-      const initialLocation = { lat: 39.9522334, lng: -75.1694917 };
-      this.map = new window.google.maps.Map(document.getElementById('map'), {
-        center: initialLocation,
-        zoom: 15
-      });
-
-      // Create the search box and link it to the UI element
-      this.searchInput = document.getElementById('restaurant-search');
-      this.searchBox = new window.google.maps.places.SearchBox(this.searchInput);
-
-      // Position the search box at the top of the map
-      this.map.controls[window.google.maps.ControlPosition.TOP_LEFT].push(document.getElementById('search-container'));
-
-      // Bias the SearchBox results towards current map's viewport
-      this.map.addListener('bounds_changed', () => {
-        this.searchBox.setBounds(this.map.getBounds());
-      });
-
-      // Listen for the event when a user selects a prediction
-      this.searchBox.addListener('places_changed', () => {
-        this.handlePlacesChanged();
-      });
-    },
-
-    handlePlacesChanged() {
-      this.loading = true;
-      const places = this.searchBox.getPlaces();
-
-      if (places.length === 0) {
-        this.loading = false;
-        return;
-      }
-
-      // Clear existing markers
-      this.markers.forEach(marker => {
-        marker.setMap(null);
-      });
-      this.markers = [];
+    clearResults() {
       this.restaurants = [];
+      this.searchPerformed = false;
+      this.error = null;
+    },
 
-      // For each place, create a marker
-      const bounds = new window.google.maps.LatLngBounds();
+    async searchRestaurants() {
+      if (!this.searchQuery.trim()) {
+        this.error = 'Please enter a search term';
+        return;
+      }
 
-      places.forEach(place => {
-        if (!place.geometry || !place.geometry.location) {
-          console.log("Returned place contains no geometry");
-          return;
+      this.loading = true;
+      this.error = null;
+      this.searchPerformed = true;
+
+      try {
+        // Get user's current position for bias parameter
+        const position = await this.getUserPosition();
+
+        // Build the API URL with the correct protocol
+        const url = new URL('https://api.geoapify.com/v2/places');
+        url.searchParams.append('categories', 'catering.restaurant');
+        url.searchParams.append('name', this.searchQuery);
+
+        // Add bias to current location if available - CORRECTED FORMAT
+        if (position) {
+          url.searchParams.append('bias', `proximity:${position.lon},${position.lat}`);
         }
 
-        // Store restaurant data
-        this.restaurants.push({
-          id: place.place_id,
-          name: place.name,
-          address: place.formatted_address || '',
-          rating: place.rating || 'Not rated',
-          location: place.geometry.location,
-          photos: place.photos ? place.photos[0].getUrl() : null
-        });
+        url.searchParams.append('limit', '20');
+        url.searchParams.append('apiKey', this.apiKey);
 
-        // Create marker icon
-        const icon = {
-          url: place.icon,
-          size: new window.google.maps.Size(71, 71),
-          origin: new window.google.maps.Point(0, 0),
-          anchor: new window.google.maps.Point(17, 34),
-          scaledSize: new window.google.maps.Size(25, 25)
-        };
+        const response = await fetch(url);
 
-        // Create a marker for the place
-        const marker = new window.google.maps.Marker({
-          map: this.map,
-          icon: icon,
-          title: place.name,
-          position: place.geometry.location
-        });
+        if (!response.ok) {
+          throw new Error(`API responded with status: ${response.status}`);
+        }
 
-        this.markers.push(marker);
+        const data = await response.json();
 
-        // Create info window for the marker
-        const infoContent = `
-          <div class="info-window">
-            <h3>${place.name}</h3>
-            <p>${place.formatted_address || ''}</p>
-            ${place.rating ? `<p>Rating: ${place.rating} ⭐</p>` : ''}
-            <button onclick="document.dispatchEvent(new CustomEvent('make-reservation', {detail: '${place.place_id}'}))">
-              Make a Reservation
-            </button>
-          </div>
-        `;
-
-        const infowindow = new window.google.maps.InfoWindow({
-          content: infoContent
-        });
-
-        marker.addListener('click', () => {
-          infowindow.open(this.map, marker);
-        });
-
-        // Extend the bounds to include the place's location
-        if (place.geometry.viewport) {
-          bounds.union(place.geometry.viewport);
+        if (data.features) {
+          this.restaurants = data.features.map(feature => feature.properties);
         } else {
-          bounds.extend(place.geometry.location);
+          this.restaurants = [];
+        }
+      } catch (err) {
+        this.error = 'Error searching for restaurants: ' + err.message;
+        this.restaurants = [];
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    getUserPosition() {
+      return new Promise((resolve) => {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              resolve({
+                lat: position.coords.latitude,
+                lon: position.coords.longitude
+              });
+            },
+            (error) => {
+              console.warn('Geolocation error:', error.message);
+              // If geolocation fails, resolve with null
+              resolve(null);
+            },
+            {
+              enableHighAccuracy: true,
+              timeout: 5000,
+              maximumAge: 0
+            }
+          );
+        } else {
+          console.warn('Geolocation is not supported by this browser');
+          resolve(null);
         }
       });
-
-      this.map.fitBounds(bounds);
-      this.loading = false;
-
-      // Listen for reservation button clicks in info windows
-      document.addEventListener('make-reservation', (e) => {
-        this.makeReservation(e.detail);
-      });
-    },
-
-    searchRestaurants() {
-      if (!this.searchInput.value.trim()) return;
-
-      // Trigger the search
-      const event = new Event('places_changed');
-      this.searchBox.dispatchEvent(event);
-    },
-
-    makeReservation(restaurantId) {
-      // Handle reservation logic here
-      console.log(`Making reservation for restaurant ID: ${restaurantId}`);
-      // You could navigate to a reservation page or open a modal
     }
   }
 }
 </script>
 
-<template>
-  <div id="map-container">
-    <div id="search-container" class="search-container">
-      <div class="search-box">
-        <input
-          id="restaurant-search"
-          type="text"
-          placeholder="Search for restaurants"
-          class="search-input"
-          v-model="searchInput"
-          @keyup.enter="searchRestaurants"
-        />
-        <button class="search-button" @click="searchRestaurants">
-          <span class="search-icon">🔍</span>
-        </button>
-      </div>
-    </div>
-
-    <div id="map"></div>
-
-    <div v-if="loading" class="loading-overlay">
-      <div class="loading-spinner"></div>
-    </div>
-
-    <div v-if="restaurants.length > 0" class="restaurant-list">
-      <h2>Search Results</h2>
-      <div v-for="restaurant in restaurants" :key="restaurant.id" class="restaurant-card">
-        <div class="restaurant-image" v-if="restaurant.photos">
-          <img :src="restaurant.photos" :alt="restaurant.name">
-        </div>
-        <div class="restaurant-info">
-          <h3>{{ restaurant.name }}</h3>
-          <p>{{ restaurant.address }}</p>
-          <p v-if="restaurant.rating">Rating: {{ restaurant.rating }} ⭐</p>
-          <button @click="makeReservation(restaurant.id)" class="reservation-button">
-            Make a Reservation
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-</template>
-
 <style scoped>
-#map-container {
-  position: relative;
-  width: 100%;
-  height: 500px;
+.restaurant-search {
+  margin: 0 auto;
+  padding: 40px 20px 80px;
+  background-color: var(--color-bg-primary);
+  min-height: calc(100vh - 80px);
 }
 
-#map {
-  width: 100%;
-  height: 100%;
+.page-title {
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: 24px;
+  text-align: center;
 }
 
 .search-container {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  z-index: 5;
-  background-color: #fff;
-  padding: 5px;
-  border-radius: 3px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-}
-
-.search-box {
   display: flex;
-  align-items: center;
+  margin: 0 auto 32px;
+  max-width: 800px;
 }
 
 .search-input {
-  box-sizing: border-box;
-  border: 1px solid #ccc;
-  width: 240px;
-  height: 32px;
-  padding: 0 12px;
-  border-radius: 3px 0 0 3px;
-  font-size: 14px;
+  flex: 1;
+  padding: 14px 20px;
+  font-size: 16px;
+  border: 1px solid var(--color-border-light);
+  border-radius: 24px 0 0 24px;
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
   outline: none;
-  text-overflow: ellipsis;
+  transition: border-color 0.2s;
+}
+
+.search-input:focus {
+  border-color: var(--color-primary);
 }
 
 .search-button {
-  height: 32px;
-  background: #4285f4;
-  color: white;
+  padding: 14px 24px;
+  background-color: var(--color-primary);
+  color: var(--color-text-inverse);
   border: none;
-  border-radius: 0 3px 3px 0;
+  border-radius: 0 24px 24px 0;
   cursor: pointer;
-  padding: 0 15px;
+  font-size: 16px;
+  font-weight: 500;
+  transition: background-color 0.2s;
 }
 
-.search-icon {
-  font-size: 14px;
+.search-button:hover {
+  background-color: var(--color-primary-dark);
 }
 
-.loading-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(255, 255, 255, 0.7);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 10;
+.loading-state, .error-state, .empty-state {
+  text-align: center;
+  padding: 40px;
+  background-color: var(--color-bg-secondary);
+  border-radius: 16px;
+  margin: 32px 0;
+}
+
+.loading-state {
+  color: var(--color-text-secondary);
 }
 
 .loading-spinner {
-  border: 4px solid #f3f3f3;
-  border-top: 4px solid #3498db;
-  border-radius: 50%;
   width: 40px;
   height: 40px;
-  animation: spin 2s linear infinite;
+  border: 4px solid var(--color-border-light);
+  border-top: 4px solid var(--color-primary);
+  border-radius: 50%;
+  margin: 0 auto 16px;
+  animation: spin 1s linear infinite;
 }
 
 @keyframes spin {
@@ -288,86 +237,37 @@ export default {
   100% { transform: rotate(360deg); }
 }
 
-.restaurant-list {
-  margin-top: 20px;
-  padding: 15px;
-  background-color: #f9f9f9;
-  border-radius: 5px;
+.error-state {
+  color: var(--color-error);
 }
 
-.restaurant-card {
-  display: flex;
-  margin-bottom: 15px;
-  background-color: white;
-  border-radius: 5px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
+.empty-state {
+  color: var(--color-text-secondary);
 }
 
-.restaurant-image {
-  width: 120px;
-  height: 120px;
-  overflow: hidden;
+.results {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 24px;
 }
 
-.restaurant-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .results {
+    grid-template-columns: 1fr;
+  }
 
-.restaurant-info {
-  padding: 10px 15px;
-  flex: 1;
-}
+  .search-container {
+    flex-direction: column;
+  }
 
-.restaurant-info h3 {
-  margin-top: 0;
-  margin-bottom: 5px;
-}
+  .search-input {
+    border-radius: 24px;
+    margin-bottom: 12px;
+  }
 
-.restaurant-info p {
-  margin: 5px 0;
-  color: #666;
-}
-
-.reservation-button {
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  padding: 8px 15px;
-  border-radius: 3px;
-  cursor: pointer;
-  margin-top: 10px;
-}
-
-.reservation-button:hover {
-  background-color: #45a049;
-}
-
-.info-window {
-  padding: 5px;
-  max-width: 200px;
-}
-
-.info-window h3 {
-  margin-top: 0;
-  font-size: 16px;
-}
-
-.info-window p {
-  margin: 5px 0;
-  font-size: 12px;
-}
-
-.info-window button {
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  padding: 5px 10px;
-  border-radius: 3px;
-  cursor: pointer;
-  font-size: 12px;
-  margin-top: 5px;
+  .search-button {
+    border-radius: 24px;
+  }
 }
 </style>
