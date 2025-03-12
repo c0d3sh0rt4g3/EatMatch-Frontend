@@ -1,6 +1,16 @@
 <script>
+import {useAuthStore} from "@/stores/authStore.js";
+
 export default {
-  name: "Footer"
+  name: "Footer",
+  computed: {
+    authStore() {
+      return useAuthStore();
+    },
+    isLogged() {
+      return this.authStore.isAuthenticated
+    }
+  }
 }
 </script>
 
@@ -15,16 +25,12 @@ export default {
     <span class="footer-icon">🔍</span>
     <span class="footer-text">Explore</span>
   </router-link>
-
-  <router-link to="/restaurants" class="footer-item" active-class="active">
-    <span class="footer-icon">⭐</span>
-    <span class="footer-text">Reviews</span>
-  </router-link>
-
-  <router-link to="/profile" class="footer-item" active-class="active">
-    <span class="footer-icon">👤</span>
-    <span class="footer-text">Profile</span>
-  </router-link>
+  <template v-if="isLogged">
+    <router-link to="/profile" class="footer-item" active-class="active">
+      <span class="footer-icon">👤</span>
+      <span class="footer-text">Profile</span>
+    </router-link>
+  </template>
 </footer>
 </template>
 
