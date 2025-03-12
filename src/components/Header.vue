@@ -46,6 +46,7 @@ export default {
   },
   methods: {
     logoutUser() {
+      this.$router.push('/');
       this.authStore.logout();
     }
   },
