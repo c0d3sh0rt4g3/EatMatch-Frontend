@@ -119,7 +119,8 @@ export default {
       const [error, data] = await authStore.register({
         name: this.name,
         email: this.email,
-        password: this.createPassword
+        password: this.createPassword,
+        password_confirmation: this.repeatPassword
       });
 
       if (error) {

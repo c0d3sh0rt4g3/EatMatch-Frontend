@@ -61,16 +61,6 @@ export default {
 </script>
 
 <template>
-  <section class="categories-section">
-    <h2>Categories</h2>
-    <div class="categories-container">
-      <div v-for="category in categories" :key="category.id" class="category-card">
-        <div class="category-icon">{{ category.icon }}</div>
-        <p>{{ category.name }}</p>
-      </div>
-    </div>
-  </section>
-
   <section class="featured-section">
     <h2>Featured Restaurants</h2>
     <div v-if="loading" class="loading">Loading restaurants...</div>
@@ -103,48 +93,6 @@ export default {
 h1, h2, h3 {
   margin: 0;
   font-weight: 600;
-}
-
-/* Categories Section */
-.categories-section {
-  padding: 24px 16px;
-}
-
-.categories-section h2 {
-  margin-bottom: 16px;
-  font-size: 20px;
-}
-
-.categories-container {
-  display: flex;
-  overflow-x: auto;
-  gap: 16px;
-  padding-bottom: 8px;
-}
-
-.category-card {
-  min-width: 80px;
-  text-align: center;
-  padding: 12px;
-  background-color: var(--color-bg-primary);
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  transition: transform 0.2s;
-}
-
-.category-card:hover {
-  transform: translateY(-5px);
-}
-
-.category-icon {
-  font-size: 24px;
-  margin-bottom: 8px;
-}
-
-.category-card p {
-  margin: 0;
-  font-size: 14px;
-  font-weight: 500;
 }
 
 /* Featured Restaurants Section */
