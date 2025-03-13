@@ -17,6 +17,10 @@ const routes = [
     {
         path: '/restaurants/:id/write-review',
         component: () => import('./pages/RestaurantReview.vue')
+    },
+    {
+        path: '/contact',
+        component: () => import('./pages/Contact.vue')
     }
 ]
 

@@ -4,7 +4,9 @@
       <h1>Eatmatch</h1>
     </div>
     <div class="sections-container">
-      <p class="nav-link">Contact us</p>
+      <router-link to="/contact">
+        <p class="nav-link">Contact us</p>
+      </router-link>
       <template v-if="!isLogged">
         <button class="auth-button login-button" @click="showLogin = true">Login</button>
         <button class="auth-button register-button" @click="showRegister = true">Register</button>
