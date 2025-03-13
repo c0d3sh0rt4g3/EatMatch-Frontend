@@ -74,9 +74,9 @@
 </template>
 
 <script>
-import axios from 'axios';
-import { useAuthStore } from "@/stores/authStore.js";
-import { useRestaurantStore } from "@/stores/restaurantStore.js";
+import {useAuthStore} from "@/stores/authStore.js";
+import {useRestaurantStore} from "@/stores/restaurantStore.js";
+import axios from "axios";
 
 export default {
   name: 'RestaurantReviewForm',
@@ -140,6 +140,42 @@ export default {
       return headers;
     },
 
+    async postRestaurant() {
+      // Verificamos que tengamos datos del restaurante
+      if (!this.restaurant) {
+        throw new Error('No hay datos disponibles para crear el restaurante.');
+      }
+
+      try {
+        // Registramos el objeto completo del restaurante
+        console.log('Datos completos del restaurante en el store:', this.restaurant);
+
+        // Solo incluimos name e id según lo solicitado
+        const restaurantData = {
+          id: this.restaurant.place_id,
+          name: this.restaurant.name
+        };
+
+        console.log('Datos del restaurante que se van a enviar:', restaurantData);
+        // Enviamos petición para crear el restaurante
+        const response = await axios.post('http://localhost:8000/api/restaurants', restaurantData, {
+          headers: this.getAuthHeaders()
+        });
+
+        console.log('Restaurante creado exitosamente en la base de datos:', response.data);
+        return response.data;
+      } catch (error) {
+        console.error('Error al crear el restaurante:', error);
+        console.error('Detalles del error:', {
+          mensaje: error.message,
+          respuesta: error.response?.data,
+          código: error.response?.status
+        });
+        throw new Error('No se pudo crear el restaurante: ' +
+          (error.response?.data?.message || error.message));
+      }
+    },
+
     async submitReview() {
       this.isSubmitting = true;
       this.submitError = null;
@@ -160,10 +196,22 @@ export default {
           this.review.reviewer_id = this.authStore.userData.user.id;
         }
 
-        // Submit review to API with auth token
-        await axios.post('http://localhost:8000/api/reviews', this.review, {
-          headers: this.getAuthHeaders()
-        });
+        try {
+          // Intentamos enviar la reseña primero
+          await axios.post('http://localhost:8000/api/reviews', this.review, {
+            headers: this.getAuthHeaders()
+          });
+        } catch (reviewError) {
+          console.error('Falló el envío de la reseña, intentando crear el restaurante primero:', reviewError);
+
+          // Si falla la reseña, intentamos crear el restaurante primero
+          await this.postRestaurant();
+
+          // Luego volvemos a intentar enviar la reseña
+          await axios.post('http://localhost:8000/api/reviews', this.review, {
+            headers: this.getAuthHeaders()
+          });
+        }
 
         // Reset form on success
         this.review.rating = '';
