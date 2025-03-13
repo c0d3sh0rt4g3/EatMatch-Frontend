@@ -74,7 +74,6 @@ export default {
             <span class="rating">★ {{ restaurant.rating }}</span>
             <span class="cuisine">{{ restaurant.cuisine }}</span>
           </div>
-          <button class="review-button">Write Review</button>
         </div>
       </div>
     </div>
