@@ -15,12 +15,8 @@ const routes = [
         component: () => import('./pages/Restaurants.vue')
     },
     {
-        path: '/restaurants/:id',
-        component: () => import('./pages/RestaurantReview.vue')
-    },
-    {
         path: '/restaurants/:id/write-review',
-        component: () => import('./pages/ReviewWritng.vue')
+        component: () => import('./pages/RestaurantReview.vue')
     }
 ]
 

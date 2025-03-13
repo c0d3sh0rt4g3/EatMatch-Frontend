@@ -8,13 +8,15 @@
         <p v-if="restaurant.city">{{ restaurant.city }}, {{ restaurant.country }}</p>
       </div>
     </div>
-    <router-link :to="`/restaurants/${restaurant.place_id}`">
-      <button class="review-button">Write Review</button>
+    <router-link :to="`/restaurants/${restaurant.place_id}/write-review`">
+      <button @click="setForReview" class="review-button">Write Review</button>
     </router-link>
   </div>
 </template>
 
 <script>
+import { useRestaurantStore } from '@/stores/restaurantStore'
+
 export default {
   name: 'RestaurantCard',
   props: {
@@ -22,11 +24,19 @@ export default {
       type: Object,
       required: true
     }
+  },
+  methods: {
+    setForReview() {
+      // Store the selected restaurant in the global store
+      const restaurantStore = useRestaurantStore()
+      restaurantStore.setCurrentRestaurant(this.restaurant)
+    }
   }
 }
 </script>
 
 <style scoped>
+/* Styles remain unchanged */
 .restaurant-card {
   background-color: var(--color-bg-secondary);
   border-radius: 16px;
