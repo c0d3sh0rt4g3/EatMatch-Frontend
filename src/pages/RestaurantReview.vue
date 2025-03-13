@@ -158,7 +158,7 @@ export default {
 
         console.log('Datos del restaurante que se van a enviar:', restaurantData);
         // Enviamos petición para crear el restaurante
-        const response = await axios.post('http://localhost:8000/api/restaurants', restaurantData, {
+        const response = await axios.post(import.meta.env.VITE_API_URL + '/restaurants', restaurantData, {
           headers: this.getAuthHeaders()
         });
 
@@ -198,7 +198,7 @@ export default {
 
         try {
           // Intentamos enviar la reseña primero
-          await axios.post('http://localhost:8000/api/reviews', this.review, {
+          await axios.post(import.meta.env.VITE_API_URL + '/reviews', this.review, {
             headers: this.getAuthHeaders()
           });
         } catch (reviewError) {
@@ -208,7 +208,7 @@ export default {
           await this.postRestaurant();
 
           // Luego volvemos a intentar enviar la reseña
-          await axios.post('http://localhost:8000/api/reviews', this.review, {
+          await axios.post(import.meta.env.VITE_API_URL + '/reviews', this.review, {
             headers: this.getAuthHeaders()
           });
         }

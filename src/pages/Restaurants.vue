@@ -48,7 +48,7 @@ export default {
   },
   data() {
     return {
-      apiKey: 'd9fb600e734c4d20afecf495f842b821',
+      apiKey: import.meta.env.VITE_GEOAPIFY_API_KEY,
       searchQuery: '',
       restaurants: [],
       loading: false,
