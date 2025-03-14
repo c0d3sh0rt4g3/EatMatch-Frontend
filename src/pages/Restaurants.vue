@@ -114,6 +114,7 @@ export default {
 
         if (data.features) {
           this.restaurants = data.features.map(feature => feature.properties);
+          console.log(this.restaurants)
         } else {
           this.restaurants = [];
         }

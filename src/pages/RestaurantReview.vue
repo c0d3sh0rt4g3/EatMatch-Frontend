@@ -18,7 +18,8 @@
 
     <div v-if="!authStore.logged" class="login-message">
       <p>Please log in to write a review</p>
-      <router-link to="/login" class="login-link">Log In</router-link>
+      <button class="auth-button login-button" @click="showLogin = true">Log In</button>
+      <Login v-if="showLogin" @close="showLogin = false" />
     </div>
 
     <form v-else-if="restaurant" @submit.prevent="submitReview" class="review-form">
@@ -77,12 +78,15 @@
 import {useAuthStore} from "@/stores/authStore.js";
 import {useRestaurantStore} from "@/stores/restaurantStore.js";
 import axios from "axios";
+import Login from "@/components/Login.vue";
 
 export default {
   name: 'RestaurantReviewForm',
+  components: {Login},
 
   data() {
     return {
+      showLogin: false,
       review: {
         restaurant_id: null,
         reviewer_id: null,
@@ -220,7 +224,7 @@ export default {
         this.submitSuccess = true;
 
         // Redirect to restaurant page
-        this.$router.push(`/restaurants/${this.review.restaurant_id}`);
+        this.$router.push(`/restaurants`);
 
         // Clear the current restaurant from store
         this.restaurantStore.clearCurrentRestaurant();
@@ -382,5 +386,15 @@ input, textarea {
   border-radius: 4px;
   text-decoration: none;
   font-weight: 500;
+}
+
+.login-button {
+  background-color: transparent;
+  color: var(--color-primary);
+  border: 1px solid var(--color-primary);
+}
+
+.login-button:hover {
+  background-color: var(--color-primary-100);
 }
 </style>

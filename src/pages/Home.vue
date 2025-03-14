@@ -85,7 +85,7 @@ export default {
         <h1 class="hero-title">Discover Culinary Excellence</h1>
         <p class="hero-subtitle">Join our community of food enthusiasts</p>
         <div class="hero-actions">
-          <router-link to="/search" class="cta-button primary">Find Places</router-link>
+          <router-link to="/restaurants" class="cta-button primary">Find Places</router-link>
         </div>
       </div>
     </section>
