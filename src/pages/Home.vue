@@ -8,24 +8,22 @@ export default {
   data() {
     return {
       featuredRestaurants: [],
-      categories: [
-        { id: 1, name: "Italian", icon: "pasta" },
-        { id: 2, name: "Japanese", icon: "sushi" },
-        { id: 3, name: "Mexican", icon: "taco" },
-        { id: 4, name: "Vegetarian", icon: "salad" }
-      ],
-      loading: false,
-      error: null
+      recentReviews: [],
+      restaurantsLoading: false,
+      reviewsLoading: false,
+      restaurantError: null,
+      reviewError: null
     };
   },
   created() {
     this.fetchRestaurants();
+    this.fetchReviews();
   },
   methods: {
     async fetchRestaurants() {
-      this.loading = true;
+      this.restaurantsLoading = true;
       try {
-        const response = await axios.get("http://localhost:8000/api/restaurants");
+        const response = await axios.get(import.meta.env.VITE_API_URL + '/restaurants');
         const restaurants = response.data;
 
         // Calculate average rating for each restaurant
@@ -38,7 +36,6 @@ export default {
             id: restaurant.id,
             name: restaurant.name,
             rating: parseFloat(avgRating),
-            // You might need to add cuisine data if it's available in your API
             cuisine: "Various", // Placeholder
             image: `/images/restaurant${restaurant.id % 5 + 1}.jpg` // Cycling through available images
           };
@@ -50,21 +47,50 @@ export default {
           .slice(0, 5);
 
       } catch (error) {
-        this.error = "Failed to fetch restaurants";
+        this.restaurantError = "Failed to fetch restaurants";
         console.error(error);
       } finally {
-        this.loading = false;
+        this.restaurantsLoading = false;
       }
+    },
+    async fetchReviews() {
+      this.reviewsLoading = true;
+      try {
+        const response = await axios.get(import.meta.env.VITE_API_URL + '/reviews');
+        const allReviews = response.data;
+        console.log(allReviews)
+        // Get 10 random reviews
+        const shuffledReviews = this.shuffleArray([...allReviews]);
+        this.recentReviews = shuffledReviews.slice(0, 10);
+      } catch (error) {
+        this.reviewError = "Failed to fetch reviews";
+        console.error(error);
+      } finally {
+        this.reviewsLoading = false;
+      }
+    },
+    shuffleArray(array) {
+      // Fisher-Yates shuffle algorithm
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    },
+    formatDate(dateString) {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
     }
   }
 };
 </script>
 
+
 <template>
   <section class="featured-section">
     <h2>Featured Restaurants</h2>
-    <div v-if="loading" class="loading">Loading restaurants...</div>
-    <div v-else-if="error" class="error">{{ error }}</div>
+    <div v-if="restaurantsLoading" class="loading">Loading restaurants...</div>
+    <div v-else-if="restaurantError" class="error">{{ restaurantError }}</div>
     <div v-else class="restaurant-cards">
       <div v-for="restaurant in featuredRestaurants" :key="restaurant.id" class="restaurant-card">
         <div class="restaurant-image" :style="{ backgroundImage: `url(${restaurant.image})` }"></div>
@@ -81,11 +107,23 @@ export default {
 
   <section class="recent-reviews">
     <h2>Recent Reviews</h2>
-    <div class="reviews-container">
-      <!-- Recent reviews would go here -->
+    <div v-if="reviewsLoading" class="loading">Loading reviews...</div>
+    <div v-else-if="reviewError" class="error">{{ reviewError }}</div>
+    <div v-else class="reviews-container">
+      <div v-for="review in recentReviews" :key="review.id" class="review-card">
+        <div class="review-header">
+          <div class="reviewer-info">
+            <h3>{{ review.restaurant.name || 'Restaurant' }}</h3>
+            <span class="review-date">{{ formatDate(review.updated_at) }}</span>
+          </div>
+          <div class="review-rating">★ {{ review.rating }}</div>
+        </div>
+        <p class="review-text">{{ review.comment }}</p>
+      </div>
     </div>
   </section>
 </template>
+
 
 <style scoped>
 
@@ -179,8 +217,85 @@ h1, h2, h3 {
   font-size: 20px;
 }
 
+.recent-reviews {
+  padding: 24px 16px;
+}
+
+.recent-reviews h2 {
+  margin-bottom: 16px;
+  font-size: 20px;
+}
+
+.reviews-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.review-card {
+  background-color: var(--color-bg-primary);
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s ease;
+}
+
+.review-card:hover {
+  transform: translateY(-4px);
+}
+
+.review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.reviewer-info h3 {
+  font-size: 16px;
+  margin-bottom: 4px;
+}
+
+.review-date {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+.review-rating {
+  color: var(--color-warning);
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.review-text {
+  font-size: 14px;
+  line-height: 1.5;
+  margin-bottom: 12px;
+  color: var(--color-text-primary);
+}
+
+.reviewer-name {
+  font-size: 14px;
+  font-style: italic;
+  color: var(--color-text-secondary);
+  text-align: right;
+}
+
+.loading, .error {
+  text-align: center;
+  padding: 20px;
+  font-size: 16px;
+}
+
+.error {
+  color: var(--color-error);
+}
+
 /* Responsive Adjustments */
 @media (max-width: 768px) {
+  .reviews-container {
+    grid-template-columns: 1fr;
+  }
   .restaurant-cards {
     grid-template-columns: 1fr;
   }
