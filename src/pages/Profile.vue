@@ -210,7 +210,7 @@ export default {
       };
 
       // Fetch user reviews
-      fetch(`http://localhost:8000/api/reviews/reviewer/${userId}`, {
+      fetch(`${import.meta.env.VITE_API_URL}/reviews/reviewer/${userId}`, {
         method: 'GET',
         headers: headers
       })
@@ -311,7 +311,7 @@ export default {
       };
 
       // Send PUT request to update the review
-      fetch(`http://localhost:8000/api/reviews/${this.editingReview.id}`, {
+      fetch(`${import.meta.env.VITE_API_URL}/reviews/${this.editingReview.id}`, {
         method: 'PUT',
         headers: headers,
         body: JSON.stringify(reviewData)
@@ -366,7 +366,7 @@ export default {
       };
 
       // Send DELETE request
-      fetch(`http://localhost:8000/api/reviews/${this.deletingReviewId}`, {
+      fetch(`${import.meta.env.VITE_API_URL}/reviews/${this.deletingReviewId}`, {
         method: 'DELETE',
         headers: headers
       })
