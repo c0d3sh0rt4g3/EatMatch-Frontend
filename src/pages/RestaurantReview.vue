@@ -80,13 +80,34 @@ import {useRestaurantStore} from "@/stores/restaurantStore.js";
 import axios from "axios";
 import Login from "@/components/Login.vue";
 
+/**
+ * Restaurant Review Page
+ *
+ * Allows users to submit reviews for restaurants. It displays restaurant information,
+ * handles authentication checks, and provides a form for submitting ratings and reviews.
+ */
 export default {
   name: 'RestaurantReviewForm',
   components: {Login},
 
+  /**
+   * Component data properties
+   * @returns {Object} Component data properties
+   */
   data() {
     return {
+      /** @type {boolean} Controls visibility of the login dialog */
       showLogin: false,
+
+      /**
+       * Review object containing the review data to be submitted
+       * @type {Object}
+       * @property {string|null} restaurant_id - ID of the restaurant being reviewed
+       * @property {number|null} reviewer_id - ID of the user submitting the review
+       * @property {string|number} rating - Star rating given to the restaurant (1-5)
+       * @property {string} title - Title of the review
+       * @property {string} body - Content of the review
+       */
       review: {
         restaurant_id: null,
         reviewer_id: null,
@@ -94,24 +115,51 @@ export default {
         title: '',
         body: ''
       },
+
+      /** @type {boolean} Indicates if a review submission is in progress */
       isSubmitting: false,
+
+      /** @type {string|null} Stores error messages during review submission */
       submitError: null,
+
+      /** @type {boolean} Indicates if the review was successfully submitted */
       submitSuccess: false
     };
   },
 
+  /**
+   * Computed properties
+   */
   computed: {
+    /**
+     * Returns the authentication store
+     * @returns {Object} Authentication store
+     */
     authStore() {
       return useAuthStore();
     },
+
+    /**
+     * Returns the restaurant store
+     * @returns {Object} Restaurant store
+     */
     restaurantStore() {
       return useRestaurantStore();
     },
+
+    /**
+     * Returns the current restaurant from the store
+     * @returns {Object|null} Current restaurant object
+     */
     restaurant() {
       return this.restaurantStore.currentRestaurant;
     }
   },
 
+  /**
+   * Lifecycle hook that runs when the component is created
+   * Sets up restaurant ID and reviewer ID
+   */
   created() {
     // Check if restaurant exists in store
     if (this.restaurant) {
@@ -129,6 +177,9 @@ export default {
   },
 
   methods: {
+    /**
+     * Extracts restaurant ID from the route parameters
+     */
     getRestaurantIdFromUrl() {
       const id = this.$route.params.id;
       if (id) {
@@ -136,6 +187,10 @@ export default {
       }
     },
 
+    /**
+     * Creates authentication headers for API requests
+     * @returns {Object} Headers object with bearer token if authenticated
+     */
     getAuthHeaders() {
       const headers = {};
       if (this.authStore.userData && this.authStore.userData.token) {
@@ -144,6 +199,11 @@ export default {
       return headers;
     },
 
+    /**
+     * Creates a restaurant in the database before submitting a review
+     * @returns {Promise<Object>} The created restaurant data
+     * @throws {Error} If restaurant creation fails
+     */
     async postRestaurant() {
       // Verificamos que tengamos datos del restaurante
       if (!this.restaurant) {
@@ -153,7 +213,6 @@ export default {
       try {
         // Registramos el objeto completo del restaurante
         console.log('Datos completos del restaurante en el store:', this.restaurant);
-
         // Solo incluimos name e id según lo solicitado
         const restaurantData = {
           id: this.restaurant.place_id,
@@ -180,6 +239,11 @@ export default {
       }
     },
 
+    /**
+     * Submits the review to the API
+     * If submission fails due to missing restaurant, attempts to create restaurant first
+     * @returns {Promise<void>}
+     */
     async submitReview() {
       this.isSubmitting = true;
       this.submitError = null;
@@ -232,13 +296,17 @@ export default {
       } catch (error) {
         console.error('Error submitting review:', error);
         this.submitError = error.response?.data?.message ||
-                           error.message ||
-                           'Failed to submit review. Please try again.';
+                          error.message ||
+                          'Failed to submit review. Please try again.';
       } finally {
         this.isSubmitting = false;
       }
     },
 
+    /**
+     * Navigates back to previous page or restaurant details
+     * Clears current restaurant from store before navigation
+     */
     goBack() {
       // Clear current restaurant from store
       this.restaurantStore.clearCurrentRestaurant();
@@ -252,6 +320,7 @@ export default {
   }
 };
 </script>
+
 
 <style scoped>
 .write-review-container {

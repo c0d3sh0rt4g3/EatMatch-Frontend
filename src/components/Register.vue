@@ -54,22 +54,55 @@
 <script>
 import { useAuthStore } from "@/stores/authStore.js";
 
+/**
+ * Registration Form Component
+ *
+ * Provides a user registration form with field validation.
+ * Handles user input, validates form fields, and submits registration data.
+ */
 export default {
   name: "Register",
+
+  /**
+   * Component data properties
+   * @returns {Object} Component data
+   */
   data() {
     return {
+      /** @type {string} User's full name */
       name: "",
+
+      /** @type {string} User's email address */
       email: "",
+
+      /** @type {string} User's chosen password */
       createPassword: "",
+
+      /** @type {string} Password confirmation entry */
       repeatPassword: "",
+
+      /** @type {string} Error message for name validation */
       nameError: "",
+
+      /** @type {string} Error message for email validation */
       emailError: "",
+
+      /** @type {string} Error message for password validation */
       createPasswordError: "",
+
+      /** @type {string} Error message for password confirmation validation */
       repeatPasswordError: "",
+
+      /** @type {string} Error message for registration failures */
       registerError: ""
     };
   },
+
   methods: {
+    /**
+     * Validates the user's name
+     * Checks if name meets minimum length requirements
+     */
     validateName() {
       this.nameError = "";
       const validName = validateName(this.name)
@@ -77,6 +110,11 @@ export default {
         this.nameError = "Name must be at least 3 characters long.";
       }
     },
+
+    /**
+     * Validates the user's email address
+     * Checks if email is in a valid format
+     */
     validateEmail() {
       this.emailError = "";
       const validMail = validateMail(this.email)
@@ -84,13 +122,23 @@ export default {
         this.emailError = "Please enter a valid email address.";
       }
     },
+
+    /**
+     * Validates the user's password
+     * Checks if password meets minimum length requirements
+     */
     validateCreatePassword() {
       this.createPasswordError = "";
       const validPassword = validatePassword(this.createPassword)
-      if (!validPassword)
+      if (!validPassword) {
         this.createPasswordError = "Password must be at least 8 characters long.";
       }
     },
+
+    /**
+     * Validates that password confirmation matches the original password
+     * Checks if both passwords are identical
+     */
     validateRepeatPassword() {
       this.repeatPasswordError = "";
       const validRepeatPassword = validateRepeatPassword(this.createPassword, this.repeatPassword)
@@ -98,6 +146,14 @@ export default {
         this.repeatPasswordError = "Passwords do not match.";
       }
     },
+
+    /**
+     * Submits user registration data to the auth store
+     * Validates all fields before submission and handles registration response
+     *
+     * @async
+     * @returns {Promise<void>}
+     */
     async registerUser() {
       // Clear previous error
       this.registerError = "";

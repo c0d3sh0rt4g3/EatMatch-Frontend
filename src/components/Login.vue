@@ -34,18 +34,60 @@
 <script>
 import { useAuthStore } from "@/stores/authStore.js";
 
+/**
+ * Login Component
+ *
+ * Provides a modal form for user authentication with email and password.
+ * Includes validation for both fields and displays appropriate error messages.
+ *
+ * @emits {Event} close - Emitted when user clicks the close button or successfully logs in
+ */
 export default {
   name: "Login",
+
+  /**
+   * Component's reactive data
+   * @returns {Object} The component's data properties
+   */
   data() {
     return {
+      /**
+       * User's email address
+       * @type {string}
+       */
       email: "",
+
+      /**
+       * User's password
+       * @type {string}
+       */
       password: "",
+
+      /**
+       * Error message for email validation
+       * @type {string}
+       */
       emailError: "",
+
+      /**
+       * Error message for password validation
+       * @type {string}
+       */
       passwordError: "",
+
+      /**
+       * Error message for login attempts
+       * @type {string}
+       */
       loginError: ""
     };
   },
+
   methods: {
+    /**
+     * Validates the email input
+     * Checks if the email follows a valid format
+     */
     validateEmail() {
       this.emailError = "";
       const validMail = validateMail(this.email)
@@ -53,13 +95,27 @@ export default {
         this.emailError = "Please enter a valid email address.";
       }
     },
-    validateCreatePassword() {
-      this.createPasswordError = "";
-      const validPassword = validatePassword(this.createPassword)
-      if (!validPassword)
-        this.createPasswordError = "Password must be at least 8 characters long.";
+
+    /**
+     * Validates the password input
+     * Checks if the password meets the minimum length requirement
+     */
+    validatePassword() {
+      this.passwordError = "";
+      const validPassword = validatePassword(this.password)
+      if (!validPassword) {
+        this.passwordError = "Password must be at least 8 characters long.";
       }
     },
+
+    /**
+     * Handles the login form submission
+     * Validates the inputs, attempts authentication via the auth store,
+     * and handles success/error states
+     *
+     * @async
+     * @emits {Event} close - Emitted on successful login
+     */
     async loginUser() {
       // Clear previous error
       this.loginError = "";

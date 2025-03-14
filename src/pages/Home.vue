@@ -1,6 +1,6 @@
 <script>
 /**
- * Home page component for Eatmatch food discovery platform.
+ * Home page for Eatmatch food discovery platform.
  * Displays a landing page with hero section, features, and rotating food quotes.
  */
 export default {

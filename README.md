@@ -47,7 +47,7 @@ cd EatMatch-Frontend
 npm install
 ```
 
-4. Create a `.env` file in the project root and configure the necessary environment variables (refer to `.env.example` if available).
+4. Create a `.env` file in the project root and configure the necessary environment variables.
 
 ### Development Mode
 
@@ -68,6 +68,18 @@ npm run build
 ```
 
 The generated files will be stored in the `dist/` directory.
+
+## Development proccess
+During my development process I found some issues wrking with google maps places API so I had to change the API to geoapify 
+due to it, I couldn't add features like the restaurants type of food, menus or photos, so I'll try to fix it in future versions tu use google places API
+
+### Future features
+
+- Fix issues with google maps places API and implement:
+- - Restaurant menus display
+- - Search by restaurant type
+- - Search by average price
+- Add following and recommendation feature
 
 ## Public Deployment Link
 

@@ -26,32 +26,71 @@ import Login from './Login.vue';
 import Register from './Register.vue';
 import { useAuthStore } from '@/stores/authStore.js';
 
+/**
+ * Application Header Component
+ *
+ * Displays the main navigation header with authentication controls.
+ * Shows login/register buttons for unauthenticated users and welcome message with logout button for logged-in users.
+ */
 export default {
   name: "Header",
   components: { Register, Login },
+
+  /**
+   * Component data
+   * @returns {Object} Component data properties
+   */
   data() {
     return {
+      /** @type {boolean} Controls visibility of the login modal */
       showLogin: false,
+
+      /** @type {boolean} Controls visibility of the registration modal */
       showRegister: false
     };
   },
+
   computed: {
+    /**
+     * Gets the authentication store instance
+     * @returns {Object} Auth store with authentication state and methods
+     */
     authStore() {
       return useAuthStore();
     },
+
+    /**
+     * Checks if a user is currently logged in
+     * @returns {boolean} True if user is authenticated, false otherwise
+     */
     isLogged() {
       return this.authStore.isAuthenticated;
     },
+
+    /**
+     * Gets the current user's name for display
+     * @returns {string} User's name or empty string if not logged in
+     */
     userName() {
       return this.authStore.userData ? this.authStore.userData.user.name : '';
     }
   },
+
   methods: {
+    /**
+     * Logs out the current user and redirects to home page
+     * Calls the logout method from the auth store and navigates to root route
+     */
     logoutUser() {
       this.$router.push('/');
       this.authStore.logout();
     }
   },
+
+  /**
+   * Lifecycle hook that runs when component is mounted to the DOM
+   * Verifies user authentication status from local storage
+   */
   mounted() {
     // Check if user exists in local storage on component mount
     this.authStore.checkLocalStorage();
@@ -165,9 +204,4 @@ export default {
     gap: 12px;
   }
 
-  .auth-button {
-    padding: 8px 16px;
-    font-size: 13px;
-  }
-}
-</style>
+  .auth-butto

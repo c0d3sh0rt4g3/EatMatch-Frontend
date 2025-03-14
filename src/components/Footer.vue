@@ -1,12 +1,29 @@
 <script>
 import {useAuthStore} from "@/stores/authStore.js";
 
+/**
+ * Footer navigation component
+ *
+ * Displays a bottom navigation bar with home, explore, and profile links.
+ * The profile link is only shown when the user is authenticated.
+ */
 export default {
   name: "Footer",
   computed: {
+    /**
+     * Returns the authentication store instance
+     *
+     * @returns {Object} The authentication store with user state and methods
+     */
     authStore() {
       return useAuthStore();
     },
+
+    /**
+     * Checks if the user is currently logged in
+     *
+     * @returns {boolean} True if the user is authenticated, false otherwise
+     */
     isLogged() {
       return this.authStore.isAuthenticated
     }

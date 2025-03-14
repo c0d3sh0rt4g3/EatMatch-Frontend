@@ -41,6 +41,13 @@
 <script>
 import RestaurantCard from "@/components/RestaurantCard.vue";
 
+/**
+ * Restaurant Search Page
+ *
+ * Allows users to search for restaurants using the Geoapify Places API.
+ * Displays search results as restaurant cards and handles loading, error,
+ * and empty states appropriately.
+ */
 export default {
   name: 'RestaurantSearch',
   components: {
@@ -48,15 +55,32 @@ export default {
   },
   data() {
     return {
+      /** @type {string} Geoapify API key from environment variables */
       apiKey: import.meta.env.VITE_GEOAPIFY_API_KEY,
+
+      /** @type {string} User's search query input */
       searchQuery: '',
+
+      /** @type {Array} List of restaurant results from API */
       restaurants: [],
+
+      /** @type {boolean} Loading state indicator during API calls */
       loading: false,
+
+      /** @type {string|null} Error message if search fails */
       error: null,
+
+      /** @type {boolean} Indicates if a search has been performed */
       searchPerformed: false
     }
   },
   watch: {
+    /**
+     * Watches for changes in the search query
+     * Clears results when input is empty
+     *
+     * @param {string} newValue - New search query value
+     */
     searchQuery(newValue) {
       if (!newValue || newValue.trim() === '') {
         this.clearResults();
@@ -64,6 +88,10 @@ export default {
     }
   },
   methods: {
+    /**
+     * Handles input changes in the search box
+     * Clears previous results when input changes after a search
+     */
     handleSearchInput() {
       // Clear results when input changes
       if (this.searchPerformed) {
@@ -71,12 +99,22 @@ export default {
       }
     },
 
+    /**
+     * Clears search results and resets search state
+     */
     clearResults() {
       this.restaurants = [];
       this.searchPerformed = false;
       this.error = null;
     },
 
+    /**
+     * Searches for restaurants using the Geoapify Places API
+     * Uses the user's current location for proximity bias if available
+     *
+     * @async
+     * @returns {Promise<void>}
+     */
     async searchRestaurants() {
       if (!this.searchQuery.trim()) {
         this.error = 'Please enter a search term';
@@ -126,6 +164,11 @@ export default {
       }
     },
 
+    /**
+     * Gets the user's current geolocation position
+     *
+     * @returns {Promise<{lat: number, lon: number}|null>} Object with latitude and longitude, or null if unavailable
+     */
     getUserPosition() {
       return new Promise((resolve) => {
         if (navigator.geolocation) {

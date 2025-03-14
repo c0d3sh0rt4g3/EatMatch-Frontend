@@ -144,33 +144,115 @@
 </template>
 
 <script>
+/**
+ * User Profile Page
+ *
+ * Displays user profile information, statistics, and review history.
+ * Allows users to view, edit and delete their restaurant reviews.
+ */
 export default {
   name: "Profile",
+  /**
+   * Component's reactive data
+   * @returns {Object} The component's data properties
+   */
   data() {
     return {
+      /**
+       * Indicates if the user is logged in
+       * @type {boolean}
+       */
       isLoggedIn: false,
+
+      /**
+       * User information from authentication
+       * @type {Object|null}
+       */
       user: null,
+
+      /**
+       * Authentication token
+       * @type {string|null}
+       */
       token: null,
+
+      /**
+       * Collection of user's reviews
+       * @type {Array}
+       */
       userReviews: [],
+
+      /**
+       * Indicates if data is currently being loaded
+       * @type {boolean}
+       */
       loading: true,
+
+      /**
+       * Error message if any operation fails
+       * @type {string|null}
+       */
       error: null,
+
+      /**
+       * Controls visibility of edit review modal
+       * @type {boolean}
+       */
       showEditModal: false,
+
+      /**
+       * Stores currently editing review data
+       * @type {Object}
+       * @property {number|null} id - Review ID
+       * @property {string} title - Review title
+       * @property {string} body - Review content
+       * @property {number} rating - Review rating (1-5)
+       */
       editingReview: {
         id: null,
         title: '',
         body: '',
         rating: 1
       },
+
+      /**
+       * Indicates if review update is in progress
+       * @type {boolean}
+       */
       updating: false,
+
+      /**
+       * Controls visibility of delete confirmation modal
+       * @type {boolean}
+       */
       showDeleteConfirm: false,
+
+      /**
+       * ID of review pending deletion
+       * @type {number|null}
+       */
       deletingReviewId: null,
+
+      /**
+       * Indicates if review deletion is in progress
+       * @type {boolean}
+       */
       deleting: false
     };
   },
+
+  /**
+   * Lifecycle hook that runs when component is created
+   */
   created() {
     this.checkAuthentication();
   },
+
   methods: {
+    /**
+     * Verifies if user is authenticated by checking local storage
+     * Sets isLoggedIn state and user data if authenticated
+     */
     checkAuthentication() {
       // Get user data from localStorage
       const userData = localStorage.getItem('userData');
@@ -195,6 +277,11 @@ export default {
         this.isLoggedIn = false;
       }
     },
+
+    /**
+     * Fetches user-specific data including reviews
+     * Sets loading and error states accordingly
+     */
     fetchUserData() {
       if (!this.isLoggedIn || !this.user?.id) {
         this.loading = false;
@@ -229,6 +316,14 @@ export default {
           this.loading = false;
         });
     },
+
+    /**
+     * Formats a date string for display
+     * Shows "Today at HH:MM" for today's dates
+     *
+     * @param {string} dateString - ISO date string to format
+     * @returns {string} Formatted date string
+     */
     formatDate(dateString) {
       if (!dateString) return '';
 
@@ -252,6 +347,12 @@ export default {
       // Otherwise show the formatted date
       return date.toLocaleDateString('en-US', options);
     },
+
+    /**
+     * Gets user's initials from name and surname
+     *
+     * @returns {string} User's initials or "?" if user data is unavailable
+     */
     getUserInitials() {
       if (!this.user) return '?';
 
@@ -260,12 +361,24 @@ export default {
 
       return (name.charAt(0) + surname.charAt(0)).toUpperCase();
     },
+
+    /**
+     * Calculates average rating from user reviews
+     *
+     * @returns {string} Formatted average rating with one decimal place
+     */
     getAverageRating() {
       if (!this.userReviews.length) return '0.0';
 
       const sum = this.userReviews.reduce((total, review) => total + review.rating, 0);
       return (sum / this.userReviews.length).toFixed(1);
     },
+
+    /**
+     * Gets formatted date showing how long user has been a member
+     *
+     * @returns {string} Month and year when user joined or "N/A" if unavailable
+     */
     getMemberSince() {
       if (!this.user || !this.user.created_at) return 'N/A';
 
@@ -273,7 +386,11 @@ export default {
       return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
     },
 
-    // Edit functionality methods
+    /**
+     * Opens the edit review modal with selected review data
+     *
+     * @param {Object} review - Review object to edit
+     */
     openEditModal(review) {
       this.editingReview = {
         id: review.id,
@@ -284,6 +401,9 @@ export default {
       this.showEditModal = true;
     },
 
+    /**
+     * Closes the edit review modal and resets form
+     */
     closeEditModal() {
       this.showEditModal = false;
       this.editingReview = {
@@ -294,6 +414,10 @@ export default {
       };
     },
 
+    /**
+     * Updates a review with edited content
+     * Sends PUT request to API with updated review data
+     */
     updateReview() {
       this.updating = true;
 
@@ -343,17 +467,28 @@ export default {
         });
     },
 
-    // Delete functionality methods
+    /**
+     * Opens delete confirmation modal for a review
+     *
+     * @param {number} reviewId - ID of review to delete
+     */
     openDeleteConfirm(reviewId) {
       this.deletingReviewId = reviewId;
       this.showDeleteConfirm = true;
     },
 
+    /**
+     * Cancels delete operation and closes confirmation modal
+     */
     cancelDelete() {
       this.showDeleteConfirm = false;
       this.deletingReviewId = null;
     },
 
+    /**
+     * Confirms and processes review deletion
+     * Sends DELETE request to API to remove review
+     */
     confirmDelete() {
       if (!this.deletingReviewId) return;
 
@@ -390,6 +525,7 @@ export default {
   }
 };
 </script>
+
 
 <style scoped>
 .profile-container {

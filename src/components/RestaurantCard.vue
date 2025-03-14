@@ -17,15 +17,37 @@
 <script>
 import { useRestaurantStore } from '@/stores/restaurantStore'
 
+/**
+ * Restaurant Card Component
+ *
+ * Displays restaurant information in a card format with name and address details.
+ * Provides a button to navigate to the review page for the selected restaurant.
+ */
 export default {
   name: 'RestaurantCard',
   props: {
+    /**
+     * Restaurant object containing details to be displayed
+     * @type {Object}
+     * @property {string} name - The name of the restaurant
+     * @property {string} [address_line1] - First line of the restaurant's address
+     * @property {string} [address_line2] - Second line of the restaurant's address (optional)
+     * @property {string} [city] - City where the restaurant is located
+     * @property {string} [country] - Country where the restaurant is located
+     * @property {string} place_id - Unique identifier for the restaurant used for routing
+     * @required
+     */
     restaurant: {
       type: Object,
       required: true
     }
   },
   methods: {
+    /**
+     * Stores the current restaurant in the global restaurant store
+     * Called when the user clicks the "Write Review" button
+     * This ensures the restaurant data is available on the review page
+     */
     setForReview() {
       // Store the selected restaurant in the global store
       const restaurantStore = useRestaurantStore()
@@ -36,7 +58,6 @@ export default {
 </script>
 
 <style scoped>
-/* Styles remain unchanged */
 .restaurant-card {
   background-color: var(--color-bg-secondary);
   border-radius: 16px;

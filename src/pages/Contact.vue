@@ -107,9 +107,28 @@
 </template>
 
 <script>
+/**
+ * Contact Page
+ *
+ * A responsive contact form with validation, submission handling, and success feedback.
+ */
 export default {
+  /**
+   * Component's reactive data
+   * @returns {Object} The component's data properties
+   */
   data() {
     return {
+      /**
+       * Form input values
+       * @type {Object}
+       * @property {string} name - User's full name
+       * @property {string} email - User's email address
+       * @property {string} phone - User's phone number (optional)
+       * @property {string} subject - Message subject line
+       * @property {string} message - Message content
+       * @property {boolean} agreeToPolicy - Privacy policy agreement checkbox
+       */
       formData: {
         name: '',
         email: '',
@@ -118,6 +137,17 @@ export default {
         message: '',
         agreeToPolicy: false
       },
+
+      /**
+       * Validation error messages
+       * @type {Object}
+       * @property {string} name - Name field error
+       * @property {string} email - Email field error
+       * @property {string} phone - Phone field error
+       * @property {string} subject - Subject field error
+       * @property {string} message - Message field error
+       * @property {string} agreeToPolicy - Policy agreement error
+       */
       errors: {
         name: '',
         email: '',
@@ -126,6 +156,11 @@ export default {
         message: '',
         agreeToPolicy: ''
       },
+
+      /**
+       * Tracks which fields have been interacted with
+       * @type {Object}
+       */
       formTouched: {
         name: false,
         email: false,
@@ -133,42 +168,101 @@ export default {
         subject: false,
         message: false
       },
+
+      /**
+       * Indicates if form has been submitted
+       * @type {boolean}
+       */
       formSubmitted: false,
+
+      /**
+       * Controls loading state during submission
+       * @type {boolean}
+       */
       isSubmitting: false,
+
+      /**
+       * Maximum allowed message length
+       * @type {number}
+       */
       maxMessageLength: 500
     }
   },
+
   computed: {
+    /**
+     * Checks if any validation errors exist
+     * @returns {boolean} True if errors exist, false otherwise
+     */
     hasErrors() {
       return Object.values(this.errors).some(error => error !== '');
     },
+
+    /**
+     * Calculates remaining characters for message field
+     * @returns {number} Number of characters left
+     */
     messageCharsLeft() {
       return this.maxMessageLength - this.formData.message.length;
     }
   },
+
   watch: {
+    /**
+     * Watches for name field changes
+     * Validates the field if it has been touched
+     */
     'formData.name'() {
       if (this.formTouched.name) this.validateField('name');
     },
+
+    /**
+     * Watches for email field changes
+     * Validates the field if it has been touched
+     */
     'formData.email'() {
       if (this.formTouched.email) this.validateField('email');
     },
+
+    /**
+     * Watches for phone field changes
+     * Validates the field if it has been touched
+     */
     'formData.phone'() {
       if (this.formTouched.phone) this.validateField('phone');
     },
+
+    /**
+     * Watches for subject field changes
+     * Validates the field if it has been touched
+     */
     'formData.subject'() {
       if (this.formTouched.subject) this.validateField('subject');
     },
+
+    /**
+     * Watches for message field changes
+     * Validates the field if it has been touched
+     */
     'formData.message'() {
       if (this.formTouched.message) this.validateField('message');
     }
   },
+
   methods: {
+    /**
+     * Marks a field as touched and validates it
+     * @param {string} field - Field name to mark as touched
+     */
     touchField(field) {
       this.formTouched[field] = true;
       this.validateField(field);
     },
 
+    /**
+     * Validates a specific form field
+     * @param {string} field - Field name to validate
+     */
     validateField(field) {
       // Reset the error for this field
       this.errors[field] = '';
@@ -223,6 +317,10 @@ export default {
       }
     },
 
+    /**
+     * Validates all form fields
+     * @returns {boolean} True if form is valid, false otherwise
+     */
     validateForm() {
       // Validate all fields
       this.validateField('name');
@@ -236,18 +334,32 @@ export default {
       return !this.hasErrors;
     },
 
+    /**
+     * Validates email format using regex
+     * @param {string} email - Email to validate
+     * @returns {boolean} True if email format is valid
+     */
     isValidEmail(email) {
       // Email validation regex
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       return emailRegex.test(email);
     },
 
+    /**
+     * Validates phone number format using regex
+     * @param {string} phone - Phone number to validate
+     * @returns {boolean} True if phone format is valid
+     */
     isValidPhone(phone) {
       // Phone validation regex (accepts various formats)
       const phoneRegex = /^[+]?[(]?[0-9]{3}[)]?[-\s.]?[0-9]{3}[-\s.]?[0-9]{4,6}$/;
       return phoneRegex.test(phone);
     },
 
+    /**
+     * Handles form submission
+     * Validates form, shows loading state, and processes submission
+     */
     submitForm() {
       this.formSubmitted = true;
 
@@ -257,7 +369,6 @@ export default {
         // Simulate an API call to submit the form
         setTimeout(() => {
           this.isSubmitting = false;
-
           // In a real application, you would handle the actual form submission here
           console.log('Form submitted:', this.formData);
         }, 1500);
@@ -272,6 +383,10 @@ export default {
       }
     },
 
+    /**
+     * Resets the form to initial state
+     * Clears all inputs, errors, and form state
+     */
     resetForm() {
       // Reset form data
       this.formData = {
@@ -309,6 +424,7 @@ export default {
   }
 }
 </script>
+
 
 <style scoped>
 .contact-form-container {
