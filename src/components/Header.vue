@@ -204,4 +204,9 @@ export default {
     gap: 12px;
   }
 
-  .auth-butto
+  .auth-button {
+    padding: 8px 16px;
+    font-size: 13px;
+  }
+}
+</style>
