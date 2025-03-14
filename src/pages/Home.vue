@@ -1,22 +1,60 @@
 <script>
+/**
+ * Home page component for Eatmatch food discovery platform.
+ * Displays a landing page with hero section, features, and rotating food quotes.
+ */
 export default {
   name: "Home",
+
+  /**
+   * Component data
+   * @returns {Object} Component data properties
+   */
   data() {
     return {
+      /**
+       * Collection of food-related quotes to display
+       * @type {Array<{text: string, author: string}>}
+       */
       foodQuotes: [
         { text: "People who love to eat are always the best people.", author: "Julia Child" },
         { text: "To eat is a necessity, but to eat intelligently is an art.", author: "François de La Rochefoucauld" },
         { text: "First we eat, then we do everything else.", author: "M.F.K. Fisher" }
       ],
+
+      /**
+       * Index of the currently displayed quote
+       * @type {number}
+       */
       currentQuote: 0,
+
+      /**
+       * User's email for newsletter subscription
+       * @type {string}
+       */
       userEmail: '',
+
+      /**
+       * Controls visibility of newsletter subscription success message
+       * @type {boolean}
+       */
       showNewsletterSuccess: false
     }
   },
+
   methods: {
+    /**
+     * Advances to the next quote in the rotation
+     * Uses modulo operation to cycle through quotes array
+     */
     nextQuote() {
       this.currentQuote = (this.currentQuote + 1) % this.foodQuotes.length;
     },
+
+    /**
+     * Handles newsletter subscription form submission
+     * Simulates API call and shows success message temporarily
+     */
     subscribeNewsletter() {
       // Simulate newsletter subscription
       this.showNewsletterSuccess = true;
@@ -26,12 +64,18 @@ export default {
       }, 3000);
     }
   },
+
+  /**
+   * Sets up automatic quote rotation when component is mounted
+   * Quotes change every 8 seconds
+   */
   mounted() {
     // Rotate quotes automatically
     setInterval(this.nextQuote, 8000);
   }
 }
 </script>
+
 
 <template>
   <div class="home-page">
