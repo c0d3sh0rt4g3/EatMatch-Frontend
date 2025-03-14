@@ -310,5 +310,204 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
+.contact-form-container {
+  width: 45vw;
+  margin: 0 auto;
+  padding: 20px 50px 50px;
+  background-color: var(--color-bg-primary);
+}
+
+.contact-form-container form{
+  background-color: var(--color-bg-primary);
+}
+
+h1 {
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: 32px;
+  text-align: center;
+}
+
+.form-group {
+  margin-bottom: 14px;
+}
+
+label {
+  display: block;
+  margin-bottom: 4px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+.required {
+  color: var(--color-error);
+  margin-left: 4px;
+}
+
+input, textarea {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid var(--color-border-light);
+  border-radius: 12px;
+  font-size: 16px;
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  transition: border-color 0.2s;
+}
+
+input:focus, textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.has-error input,
+.has-error textarea {
+  border-color: var(--color-error);
+}
+
+.error-container {
+  min-height: 20px;
+}
+
+.error-message {
+  color: var(--color-error);
+  font-size: 12px;
+  display: block;
+  margin-top: 6px;
+}
+
+.message-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.char-count {
+  font-size: 12px;
+  color: var(--color-text-tertiary);
+  margin-top: 6px;
+}
+
+.limit-close {
+  color: var(--color-warning);
+}
+
+.limit-reached {
+  color: var(--color-error);
+}
+
+.checkbox-group {
+  display: flex;
+  align-items: flex-start;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: flex-start;
+  cursor: pointer;
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: auto;
+  margin-right: 10px;
+  margin-top: 2px;
+}
+
+.checkbox-text {
+  font-weight: normal;
+}
+
+.form-actions {
+  margin-top: 32px;
+  text-align: center;
+}
+
+button {
+  padding: 14px 32px;
+  background-color: var(--color-primary);
+  color: var(--color-text-inverse);
+  border: none;
+  border-radius: 24px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  min-width: 160px;
+}
+
+button:hover:not(:disabled) {
+  background-color: var(--color-primary-dark);
+}
+
+button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--color-text-inverse);
+  border-top: 2px solid transparent;
+  border-radius: 50%;
+  margin-right: 8px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.success-message {
+  text-align: center;
+  background-color: var(--color-bg-secondary);
+  padding: 40px;
+  border-radius: 16px;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.success-message h2 {
+  color: var(--color-success);
+  font-size: 24px;
+  margin-bottom: 16px;
+}
+
+.success-message p {
+  color: var(--color-text-secondary);
+  margin-bottom: 24px;
+}
+
+.reset-button {
+  background-color: transparent;
+  color: var(--color-primary);
+  border: 1px solid var(--color-primary);
+}
+
+.reset-button:hover {
+  background-color: var(--color-primary-100);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .contact-form-container {
+    padding: 32px 16px 64px;
+  }
+
+  button {
+    width: 100%;
+  }
+
+  .message-footer {
+    flex-direction: column;
+  }
+}
 </style>

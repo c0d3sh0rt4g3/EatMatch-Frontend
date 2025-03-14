@@ -94,6 +94,7 @@ export default {
   transition: color 0.2s;
   margin: 0;
   white-space: nowrap;
+  text-underline: none;
 }
 
 .nav-link:hover {
