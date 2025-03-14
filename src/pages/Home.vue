@@ -139,7 +139,7 @@ export default {
   position: relative;
   height: 90vh;
   min-height: 600px;
-  background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('/images/hero-food.jpg');
+  background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('../images/hero-food.jpg');
   background-size: cover;
   background-position: center;
   display: flex;
