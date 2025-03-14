@@ -72,26 +72,29 @@ export default {
   methods: {
     validateName() {
       this.nameError = "";
-      if (!this.name || this.name.trim().length < 3) {
+      const validName = validateName(this.name)
+      if (!validName) {
         this.nameError = "Name must be at least 3 characters long.";
       }
     },
     validateEmail() {
       this.emailError = "";
-      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailPattern.test(this.email)) {
+      const validMail = validateMail(this.email)
+      if (!validMail) {
         this.emailError = "Please enter a valid email address.";
       }
     },
     validateCreatePassword() {
       this.createPasswordError = "";
-      if (!this.createPassword || this.createPassword.length < 6) {
-        this.createPasswordError = "Password must be at least 6 characters long.";
+      const validPassword = validatePassword(this.createPassword)
+      if (!validPassword)
+        this.createPasswordError = "Password must be at least 8 characters long.";
       }
     },
     validateRepeatPassword() {
       this.repeatPasswordError = "";
-      if (this.repeatPassword !== this.createPassword) {
+      const validRepeatPassword = validateRepeatPassword(this.createPassword, this.repeatPassword)
+      if (!validRepeatPassword) {
         this.repeatPasswordError = "Passwords do not match.";
       }
     },

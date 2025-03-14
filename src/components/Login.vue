@@ -48,15 +48,16 @@ export default {
   methods: {
     validateEmail() {
       this.emailError = "";
-      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailPattern.test(this.email)) {
+      const validMail = validateMail(this.email)
+      if (!validMail) {
         this.emailError = "Please enter a valid email address.";
       }
     },
-    validatePassword() {
-      this.passwordError = "";
-      if (!this.password || !this.password.trim()) {
-        this.passwordError = "Please enter a valid password.";
+    validateCreatePassword() {
+      this.createPasswordError = "";
+      const validPassword = validatePassword(this.createPassword)
+      if (!validPassword)
+        this.createPasswordError = "Password must be at least 8 characters long.";
       }
     },
     async loginUser() {
