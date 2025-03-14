@@ -74,6 +74,3 @@ The generated files will be stored in the `dist/` directory.
 You can access the online version of EatMatch at the following link:
 
 [https://eatmatch.example.com](https://eatmatch-frontend.onrender.com)
-
-> **Note**: Replace the above link with the actual URL of your deployed application.
-
